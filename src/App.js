@@ -1,25 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import Navigation from './components/Navigation/Navigation';
+
+export class App extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            currentTab: "Login"
+        };
+    }
+
+    componentDidMount() {
+        document.title = this.title;
+    }
+
+    get title() {
+        return "🚖 Loft-Taxi " + this.state.currentTab;
+    }
+
+    changeTab = (newTab) => {
+        this.setState({
+            currentTab: newTab
+        });
+        document.title = this.title;
+    }
+
+    render() {
+        return (
+            <div className="App">
+                <header className="App-header">
+                    <Navigation currentTab={this.state.currentTab} changeTab={this.changeTab} />
+                </header>
+            </div>
+        );
+    }
 }
 
 export default App;
