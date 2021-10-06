@@ -1,0 +1,14 @@
+.Login {
+    height: 100vh;
+    display: flex;
+}
+
+.Login .login-form-container {
+    width: 66%;
+    display: flex;
+    align-items: center;
+    background-size: cover;
+    justify-content: center;
+    background-color: #000;
+    background-image: url("./images/bg-auth.283ac044.jpg");
+}
