@@ -1,7 +1,19 @@
 import React from "react";
 
-export class Registration extends React.Component {
+import AsideLogo from "../AsideLogo/AsideLogo";
+import RegistrationForm from "../RegistrationForm/RegistrationForm";
+
+import "./Registration.css";
+
+export default class Registration extends React.Component {
     render() {
-        return null;
+        return (
+            <div className="Registration">
+                <AsideLogo />
+                <div className="registration-form-container">
+                    <RegistrationForm onSignedUp={this.props.onSignedUp} changeTab={this.props.changeTab} />
+                </div>
+            </div>
+        );
     }
 }

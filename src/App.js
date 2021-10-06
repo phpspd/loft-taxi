@@ -1,6 +1,10 @@
 import React from 'react';
 
-import Navigation from './components/Navigation/Navigation';
+import Header from './components/Header/Header';
+import Login from './components/Login/Login';
+import Map from './components/Map/Map';
+import Profile from './components/Profile/Profile';
+import Registration from './components/Registration/Registration';
 
 export class App extends React.Component {
     constructor(props) {
@@ -25,12 +29,25 @@ export class App extends React.Component {
         document.title = this.title;
     }
 
+    onLoggedIn = ({ email } = {}) => {
+        this.setState({
+            email,
+            currentTab: "Map"
+        });
+    }
+
     render() {
         return (
             <div className="App">
-                <header className="App-header">
-                    <Navigation currentTab={this.state.currentTab} changeTab={this.changeTab} />
-                </header>
+                <Header currentTab={this.state.currentTab} changeTab={this.changeTab} />
+                {
+                    {
+                        Login: <Login onLoggedIn={this.onLoggedIn} changeTab={this.changeTab} />,
+                        Map: <Map />,
+                        Profile: <Profile />,
+                        Registration: <Registration onSignedUp={this.onLoggedIn} changeTab={this.changeTab} />
+                    }[this.state.currentTab]
+                }
             </div>
         );
     }
