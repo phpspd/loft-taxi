@@ -23,23 +23,32 @@ export class App extends React.Component {
     }
 
     changeTab = (newTab) => {
+        console.log("New tab", newTab);
+        document.title = this.title;
         this.setState({
             currentTab: newTab
         });
-        document.title = this.title;
     }
 
     onLoggedIn = ({ email } = {}) => {
         this.setState({
             email,
-            currentTab: "Map"
+            currentTab: "Map",
+            isLoggedIn: true
         });
+    }
+
+    logout = () => {
+        this.setState({
+            isLoggedIn: false
+        });
+        this.changeTab("Login");
     }
 
     render() {
         return (
             <div className="App">
-                <Header currentTab={this.state.currentTab} changeTab={this.changeTab} />
+                { this.state.isLoggedIn ? <Header currentTab={this.state.currentTab} changeTab={this.changeTab} logout={this.logout} /> : null }
                 {
                     {
                         Login: <Login onLoggedIn={this.onLoggedIn} changeTab={this.changeTab} />,

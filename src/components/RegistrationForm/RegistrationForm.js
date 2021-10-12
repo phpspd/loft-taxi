@@ -1,11 +1,24 @@
 import React from "react";
 
-import FormRow from "../form/FormRow/FormRow";
-import InputText from "../form/InputText/InputText";
-import InputPassword from "../form/InputPassword/InputPassword";
+import { FlexRow, FlexRowSpacer } from "../form/FlexRow/FlexRow";
 import LoginLink from "./LoginLink/LoginLink";
 
 import "./RegistrationForm.css";
+import { Container, Paper, styled, TextField, Typography } from "@material-ui/core";
+import SubmitButton from "../SubmitButton/SubmitButton";
+
+const RegistrationFormPaper = styled(Paper)({
+    width: "520px",
+    padding: "48px 0",
+    borderRadius: "20px"
+});
+
+const RegistrationFormContainer = styled(Container)({
+    display: "flex",
+    padding: "0 102px 0 98px",
+    alignItems: "center",
+    flexDirection: "column"
+});
 
 export default class RegistrationForm extends React.Component {
     constructor(props) {
@@ -31,29 +44,49 @@ export default class RegistrationForm extends React.Component {
 
     render() {
         return (
-            <div className="RegistrationForm">
-                <div className="RegistrationForm-content">
-                    <h4>Регистрация</h4>
+            <RegistrationFormPaper className="RegistrationForm" elevation={5}>
+                <RegistrationFormContainer maxWidth="lg">
+                    <Typography variant="h4">Регистрация</Typography>
                     <form onSubmit={this.onSubmit}>
-                        <FormRow>
-                            <InputText label="Адрес электронной почты" name="email" />
-                        </FormRow>
-                        <FormRow>
-                            <InputText label="Имя" name="name" />
-                            <div className="spacer"></div>
-                            <InputText label="Фамилия" name="surname" />
-                        </FormRow>
-                        <FormRow>
-                            <InputPassword name="password" />
-                        </FormRow>
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            type="email"
+                            label="Адрес электронной почты"
+                            name="email"
+                        />
+                        <FlexRow>
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                label="Имя"
+                                name="name"
+                            />
+                            <FlexRowSpacer />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                label="Фамилия"
+                                name="surname"
+                            />
+                        </FlexRow>
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            type="password"
+                            label="Пароль"
+                            name="password"
+                        />
 
-                        <button tabIndex="0" type="submit">
-                            <span className="label">Зарегистрироваться</span>
-                        </button>
+                        <SubmitButton>Зарегистрироваться</SubmitButton>
                     </form>
                     <LoginLink changeTab={this.props.changeTab} />
-                </div>
-            </div>
+                </RegistrationFormContainer>
+            </RegistrationFormPaper>
         );
     }
 }

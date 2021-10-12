@@ -1,11 +1,23 @@
 import React from "react";
 
-import FormRow from "../form/FormRow/FormRow";
-import InputText from "../form/InputText/InputText";
-import InputPassword from "../form/InputPassword/InputPassword";
 import RegistrationLink from "./RegistrationLink/RegistrationLink";
+import SubmitButton from "../SubmitButton/SubmitButton";
 
 import "./LoginForm.css";
+import { styled, Container, Paper, TextField, Typography } from "@material-ui/core";
+
+const LoginFormPaper = styled(Paper)({
+    width: "520px",
+    padding: "48px 0",
+    borderRadius: "20px"
+});
+
+const LoginFormContainer = styled(Container)({
+    display: "flex",
+    padding: "0 102px 0 98px",
+    alignItems: "center",
+    flexDirection: "column"
+});
 
 export default class LoginForm extends React.Component {
     constructor(props) {
@@ -19,7 +31,6 @@ export default class LoginForm extends React.Component {
 
         const email = event.target.email.value;
         const password = event.target.password.value;
-        console.log(email, password);
 
         if (!email || !password || typeof this.props.onLoggedIn !== "function") {
             return ;
@@ -30,23 +41,33 @@ export default class LoginForm extends React.Component {
 
     render() {
         return (
-            <div className="LoginForm">
-                <div className="LoginForm-content">
-                    <h4>Войти</h4>
+            <LoginFormPaper className="LoginForm" elevation={5}>
+                <LoginFormContainer maxWidth="lg">
+                    <Typography variant="h4">Войти</Typography>
                     <form onSubmit={this.onSubmit}>
-                        <FormRow>
-                            <InputText type="email" label="Имя пользователя" name="email" placeholder="email@example.com" />
-                        </FormRow>
-                        <FormRow>
-                            <InputPassword name="password" />
-                        </FormRow>
-                        <button tabIndex="0" type="submit">
-                            <span className="label">Войти</span>
-                        </button>
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            type="email"
+                            label="Имя пользователя"
+                            name="email"
+                            placeholder="email@example.com"
+                        />
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            type="password"
+                            label="Пароль"
+                            name="password"
+                            placeholder="*********"
+                        />
+                        <SubmitButton>Войти</SubmitButton>
                     </form>
                     <RegistrationLink changeTab={this.props.changeTab} />
-                </div>
-            </div>
+                </LoginFormContainer>
+            </LoginFormPaper>
         );
     }
 }

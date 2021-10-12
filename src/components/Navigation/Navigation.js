@@ -2,6 +2,9 @@ import React from 'react';
 
 import "./Navigation.css";
 
+import { Button, Toolbar } from '@material-ui/core';
+import NavigationLogo from './NavigationLogo/NavigationLogo';
+
 const tabs = {
     Map: {
         href: "/main/order",
@@ -10,31 +13,39 @@ const tabs = {
     Profile: {
         href: "/main/profile",
         caption: "Профиль"
-    },
-    Login: {
-        href: "/main/login",
-        caption: "Логин"
     }
 }
 
 class Navigation extends React.Component {
-    changeTab = (e) => {
+    changeTab = newTab => {
+        if (newTab && typeof this.props.changeTab === "function") {
+            this.props.changeTab(newTab);
+        }
+    }
+
+    logout = e => {
         e.preventDefault();
-        if (typeof this.props.changeTab === "function") {
-            this.props.changeTab(e.target.parentNode.name);
+        if (typeof this.props.logout === "function") {
+            this.props.logout();
         }
     }
 
     render() {
         const { currentTab } = this.props;
         return (
-            <div className="Navigation">
+            <Toolbar className="Navigation" variant="regular">
+                <NavigationLogo />
                 {Object.keys(tabs).map((tabKey) => (
-                    <a key={tabKey} href={tabs[tabKey].href} name={tabKey} className={currentTab === tabKey ? "active": null}>
-                        <span onClick={this.changeTab}>{tabs[tabKey].caption}</span>
-                    </a>
+                    <Button
+                        key={tabKey}
+                        href={tabs[tabKey].href}
+                        className={currentTab === tabKey ? "active": null}
+                        onClick={(e) => { e.preventDefault(); this.changeTab(tabKey); }}
+                        color="inherit"
+                    >{tabs[tabKey].caption}</Button>
                 ))}
-            </div>
+                <Button href="/main/logout" name="logout" onClick={this.logout} color="inherit">Выйти</Button>
+            </Toolbar>
         );
     }
 }

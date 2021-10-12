@@ -1,15 +1,21 @@
 import { React } from "react";
 
-import "./FormRow.css"
+import "./FlexRow.css"
 
-export default function FormRow(props) {
+export function FlexRow(props) {
     const children = !props.children || Array.isArray(props.children)
             ? props.children
             : [ props.children ];
 
     return (
-        <div className="FormRow">
+        <div className="FlexRow">
             {children}
         </div>
-    )
+    );
+}
+
+export function FlexRowSpacer() {
+    return (
+        <div className="spacer"></div>
+    );
 }
