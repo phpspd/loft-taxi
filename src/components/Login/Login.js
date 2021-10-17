@@ -11,7 +11,7 @@ export default class Login extends React.Component {
             <div className="Login">
                 <AsideLogo />
                 <div className="login-form-container">
-                    <LoginForm onLoggedIn={this.props.onLoggedIn} changeTab={this.props.changeTab} />
+                    <LoginForm />
                 </div>
             </div>
         );

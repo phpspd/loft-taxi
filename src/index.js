@@ -6,11 +6,17 @@ import reportWebVitals from './reportWebVitals';
 
 import { theme } from "loft-taxi-mui-theme";
 import { MuiThemeProvider } from "@material-ui/core/styles";
+import { AuthProvider } from './contexts/AuthContext/AuthContext';
+import { NavigationProvider } from './contexts/NavigationContext/NavigationContext';
 
 ReactDOM.render(
     <React.StrictMode>
         <MuiThemeProvider theme={theme}>
-            <App />
+            <AuthProvider>
+                <NavigationProvider>
+                    <App />
+                </NavigationProvider>
+            </AuthProvider>
         </MuiThemeProvider>
     </React.StrictMode>,
     document.getElementById('root')

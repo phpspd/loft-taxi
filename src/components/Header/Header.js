@@ -14,7 +14,7 @@ export default class Header extends React.Component {
     render() {
         return (
             <HeaderAppBar position="static" color="primary" elevation={4}>
-                <Navigation currentTab={this.props.currentTab} changeTab={this.props.changeTab} logout={this.props.logout} />
+                <Navigation />
             </HeaderAppBar>
         );
     }

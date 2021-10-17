@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Button from '@material-ui/core/Button';
@@ -13,7 +14,16 @@ const useStyles = makeStyles({
     }
 });
 
-export default function SubmitButton(props) {
+const SubmitButton = props => {
     const classes = useStyles();
     return <Button className={classes.root} variant="contained" type="submit" color="primary" fullWidth={true}>{props.children}</Button>;
 }
+
+SubmitButton.propTypes = {
+    children: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.arrayOf(PropTypes.string)
+    ]).isRequired
+}
+
+export default SubmitButton;

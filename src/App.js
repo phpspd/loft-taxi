@@ -2,64 +2,40 @@ import React from 'react';
 
 import Header from './components/Header/Header';
 import Login from './components/Login/Login';
-import Map from './components/Map/Map';
+import MapPage from './components/MapPage/MapPage';
 import Profile from './components/Profile/Profile';
 import Registration from './components/Registration/Registration';
+import { withAuth } from './contexts/AuthContext/AuthContext';
+import { withNavigation } from './contexts/NavigationContext/NavigationContext';
 
 export class App extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            currentTab: "Login"
-        };
-    }
-
     componentDidMount() {
         document.title = this.title;
     }
 
-    get title() {
-        return "🚖 Loft-Taxi " + this.state.currentTab;
-    }
-
-    changeTab = (newTab) => {
-        console.log("New tab", newTab);
+    componentDidUpdate() {
         document.title = this.title;
-        this.setState({
-            currentTab: newTab
-        });
     }
 
-    onLoggedIn = ({ email } = {}) => {
-        this.setState({
-            email,
-            currentTab: "Map",
-            isLoggedIn: true
-        });
-    }
-
-    logout = () => {
-        this.setState({
-            isLoggedIn: false
-        });
-        this.changeTab("Login");
+    get title() {
+        return "🚖 Loft-Taxi " + this.props.currentPage;
     }
 
     render() {
         return (
             <div className="App">
-                { this.state.isLoggedIn ? <Header currentTab={this.state.currentTab} changeTab={this.changeTab} logout={this.logout} /> : null }
+                { this.props.isLoggedIn ? <Header /> : null }
                 {
                     {
-                        Login: <Login onLoggedIn={this.onLoggedIn} changeTab={this.changeTab} />,
-                        Map: <Map />,
+                        Login: <Login />,
+                        Map: <MapPage />,
                         Profile: <Profile />,
-                        Registration: <Registration onSignedUp={this.onLoggedIn} changeTab={this.changeTab} />
-                    }[this.state.currentTab]
+                        Registration: <Registration />
+                    }[this.props.currentPage]
                 }
             </div>
         );
     }
 }
 
-export default App;
+export default withNavigation(withAuth(App));

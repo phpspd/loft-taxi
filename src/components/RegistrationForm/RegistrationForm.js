@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 import { FlexRow, FlexRowSpacer } from "../form/FlexRow/FlexRow";
 import LoginLink from "./LoginLink/LoginLink";
@@ -6,6 +7,8 @@ import LoginLink from "./LoginLink/LoginLink";
 import "./RegistrationForm.css";
 import { Container, Paper, styled, TextField, Typography } from "@material-ui/core";
 import SubmitButton from "../SubmitButton/SubmitButton";
+import { withAuth } from "../../contexts/AuthContext/AuthContext";
+import { withNavigation } from "../../contexts/NavigationContext/NavigationContext";
 
 const RegistrationFormPaper = styled(Paper)({
     width: "520px",
@@ -20,26 +23,32 @@ const RegistrationFormContainer = styled(Container)({
     flexDirection: "column"
 });
 
-export default class RegistrationForm extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.onSubmit = this.onSubmit.bind(this);
+export class RegistrationForm extends React.Component {
+    static propTypes = {
+        isLoggedIn: PropTypes.bool,
+        navigateTo: PropTypes.func.isRequired,
+        logIn: PropTypes.func
     }
 
-    onSubmit(event) {
+    componentDidUpdate() {
+        if (this.props.isLoggedIn) {
+            this.props.navigateTo("Map");
+        }
+    }
+
+    register = event => {
         event.preventDefault();
 
         const email = event.target.email.value;
-        const surname = event.target.surname.value;
-        const name = event.target.name.value;
+        const lastName = event.target.lastName.value;
+        const firstName = event.target.firstName.value;
         const password = event.target.password.value;
 
-        if (!email || !surname || !name || !password || typeof this.props.onSignedUp !== "function") {
+        if (!email || !lastName || !firstName || !password || typeof this.props.logIn !== "function") {
             return ;
         }
 
-        this.props.onSignedUp({ email });
+        this.props.logIn(email, password);
     }
 
     render() {
@@ -47,7 +56,7 @@ export default class RegistrationForm extends React.Component {
             <RegistrationFormPaper className="RegistrationForm" elevation={5}>
                 <RegistrationFormContainer maxWidth="lg">
                     <Typography variant="h4">Регистрация</Typography>
-                    <form onSubmit={this.onSubmit}>
+                    <form onSubmit={this.register} data-testid="RegistrationForm-form">
                         <TextField
                             margin="normal"
                             required
@@ -62,7 +71,7 @@ export default class RegistrationForm extends React.Component {
                                 required
                                 fullWidth
                                 label="Имя"
-                                name="name"
+                                name="firstName"
                             />
                             <FlexRowSpacer />
                             <TextField
@@ -70,7 +79,7 @@ export default class RegistrationForm extends React.Component {
                                 required
                                 fullWidth
                                 label="Фамилия"
-                                name="surname"
+                                name="lastName"
                             />
                         </FlexRow>
                         <TextField
@@ -84,9 +93,11 @@ export default class RegistrationForm extends React.Component {
 
                         <SubmitButton>Зарегистрироваться</SubmitButton>
                     </form>
-                    <LoginLink changeTab={this.props.changeTab} />
+                    <LoginLink />
                 </RegistrationFormContainer>
             </RegistrationFormPaper>
         );
     }
 }
+
+export default withNavigation(withAuth(RegistrationForm));

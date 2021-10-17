@@ -1,10 +1,13 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 import RegistrationLink from "./RegistrationLink/RegistrationLink";
 import SubmitButton from "../SubmitButton/SubmitButton";
 
 import "./LoginForm.css";
 import { styled, Container, Paper, TextField, Typography } from "@material-ui/core";
+import { withAuth } from "../../contexts/AuthContext/AuthContext";
+import { withNavigation } from "../../contexts/NavigationContext/NavigationContext";
 
 const LoginFormPaper = styled(Paper)({
     width: "520px",
@@ -19,32 +22,41 @@ const LoginFormContainer = styled(Container)({
     flexDirection: "column"
 });
 
-export default class LoginForm extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.onSubmit = this.onSubmit.bind(this);
+export class LoginForm extends React.Component {
+    static propTypes = {
+        isLoggedIn: PropTypes.bool,
+        logIn: PropTypes.func,
+        navigateTo: PropTypes.func.isRequired
     }
 
-    onSubmit(event) {
+    componentDidUpdate() {
+        if (this.props.isLoggedIn) {
+            this.props.navigateTo("Map");
+        }
+    }
+
+    authenticate = event => {
         event.preventDefault();
 
         const email = event.target.email.value;
         const password = event.target.password.value;
-
-        if (!email || !password || typeof this.props.onLoggedIn !== "function") {
+        if (!email || !password || typeof this.props.logIn !== "function") {
             return ;
         }
 
-        this.props.onLoggedIn({ email });
+        this.props.logIn(email, password);
     }
 
     render() {
+        if (this.props.isLoggedIn) {
+            return null;
+        }
+
         return (
             <LoginFormPaper className="LoginForm" elevation={5}>
                 <LoginFormContainer maxWidth="lg">
                     <Typography variant="h4">Войти</Typography>
-                    <form onSubmit={this.onSubmit}>
+                    <form onSubmit={this.authenticate} data-testid="LoginForm-form">
                         <TextField
                             margin="normal"
                             required
@@ -53,6 +65,7 @@ export default class LoginForm extends React.Component {
                             label="Имя пользователя"
                             name="email"
                             placeholder="email@example.com"
+                            data-testid="TextField-email"
                         />
                         <TextField
                             margin="normal"
@@ -62,12 +75,15 @@ export default class LoginForm extends React.Component {
                             label="Пароль"
                             name="password"
                             placeholder="*********"
+                            data-testid="TextField-password"
                         />
                         <SubmitButton>Войти</SubmitButton>
                     </form>
-                    <RegistrationLink changeTab={this.props.changeTab} />
+                    <RegistrationLink />
                 </LoginFormContainer>
             </LoginFormPaper>
         );
     }
 }
+
+export default withNavigation(withAuth(LoginForm));
