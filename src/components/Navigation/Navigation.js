@@ -1,8 +1,14 @@
 import React from 'react';
+import PropTypes from "prop-types";
 
 import "./Navigation.css";
 
-const tabs = {
+import { Button, Toolbar } from '@material-ui/core';
+import NavigationLogo from './NavigationLogo/NavigationLogo';
+import { withAuth } from '../../contexts/AuthContext/AuthContext';
+import { withNavigation } from '../../contexts/NavigationContext/NavigationContext';
+
+export const tabs = {
     Map: {
         href: "/main/order",
         caption: "Карта"
@@ -10,33 +16,43 @@ const tabs = {
     Profile: {
         href: "/main/profile",
         caption: "Профиль"
-    },
-    Login: {
-        href: "/main/login",
-        caption: "Логин"
     }
 }
 
-class Navigation extends React.Component {
-    changeTab = (e) => {
+export class Navigation extends React.Component {
+    static propTypes = {
+        currentPage: PropTypes.oneOf(Object.keys(tabs)),
+        navigateTo: PropTypes.func,
+        logOut: PropTypes.func
+    }
+
+    logOut = e => {
         e.preventDefault();
-        if (typeof this.props.changeTab === "function") {
-            this.props.changeTab(e.target.parentNode.name);
+        if (typeof this.props.logOut === "function") {
+            this.props.logOut();
+            this.props.navigateTo("Login");
         }
     }
 
     render() {
-        const { currentTab } = this.props;
+        const { currentPage } = this.props;
         return (
-            <div className="Navigation">
+            <Toolbar className="Navigation" variant="regular">
+                <NavigationLogo />
                 {Object.keys(tabs).map((tabKey) => (
-                    <a key={tabKey} href={tabs[tabKey].href} name={tabKey} className={currentTab === tabKey ? "active": null}>
-                        <span onClick={this.changeTab}>{tabs[tabKey].caption}</span>
-                    </a>
+                    <Button
+                        key={tabKey}
+                        data-page={tabKey}
+                        href={tabs[tabKey].href}
+                        className={currentPage === tabKey ? "active": null}
+                        onClick={(e) => { e.preventDefault(); this.props.navigateTo(tabKey); }}
+                        color="inherit"
+                    >{tabs[tabKey].caption}</Button>
                 ))}
-            </div>
+                <Button href="/main/logout" name="logout" onClick={this.logOut} color="inherit">Выйти</Button>
+            </Toolbar>
         );
     }
 }
 
-export default Navigation;
+export default withNavigation(withAuth(Navigation));

@@ -1,8 +1,8 @@
-.FormRow {
+.FlexRow {
     display: flex;
     justify-content: space-between;
 }
 
-.FormRow .spacer {
+.FlexRow .spacer {
     min-width: 8px;
 }

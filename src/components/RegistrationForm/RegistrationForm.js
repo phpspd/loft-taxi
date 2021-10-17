@@ -1,59 +1,103 @@
 import React from "react";
+import PropTypes from "prop-types";
 
-import FormRow from "../form/FormRow/FormRow";
-import InputText from "../form/InputText/InputText";
-import InputPassword from "../form/InputPassword/InputPassword";
+import { FlexRow, FlexRowSpacer } from "../form/FlexRow/FlexRow";
 import LoginLink from "./LoginLink/LoginLink";
 
 import "./RegistrationForm.css";
+import { Container, Paper, styled, TextField, Typography } from "@material-ui/core";
+import SubmitButton from "../SubmitButton/SubmitButton";
+import { withAuth } from "../../contexts/AuthContext/AuthContext";
+import { withNavigation } from "../../contexts/NavigationContext/NavigationContext";
 
-export default class RegistrationForm extends React.Component {
-    constructor(props) {
-        super(props);
+const RegistrationFormPaper = styled(Paper)({
+    width: "520px",
+    padding: "48px 0",
+    borderRadius: "20px"
+});
 
-        this.onSubmit = this.onSubmit.bind(this);
+const RegistrationFormContainer = styled(Container)({
+    display: "flex",
+    padding: "0 102px 0 98px",
+    alignItems: "center",
+    flexDirection: "column"
+});
+
+export class RegistrationForm extends React.Component {
+    static propTypes = {
+        isLoggedIn: PropTypes.bool,
+        navigateTo: PropTypes.func.isRequired,
+        logIn: PropTypes.func
     }
 
-    onSubmit(event) {
+    componentDidUpdate() {
+        if (this.props.isLoggedIn) {
+            this.props.navigateTo("Map");
+        }
+    }
+
+    register = event => {
         event.preventDefault();
 
         const email = event.target.email.value;
-        const surname = event.target.surname.value;
-        const name = event.target.name.value;
+        const lastName = event.target.lastName.value;
+        const firstName = event.target.firstName.value;
         const password = event.target.password.value;
 
-        if (!email || !surname || !name || !password || typeof this.props.onSignedUp !== "function") {
+        if (!email || !lastName || !firstName || !password || typeof this.props.logIn !== "function") {
             return ;
         }
 
-        this.props.onSignedUp({ email });
+        this.props.logIn(email, password);
     }
 
     render() {
         return (
-            <div className="RegistrationForm">
-                <div className="RegistrationForm-content">
-                    <h4>Регистрация</h4>
-                    <form onSubmit={this.onSubmit}>
-                        <FormRow>
-                            <InputText label="Адрес электронной почты" name="email" />
-                        </FormRow>
-                        <FormRow>
-                            <InputText label="Имя" name="name" />
-                            <div className="spacer"></div>
-                            <InputText label="Фамилия" name="surname" />
-                        </FormRow>
-                        <FormRow>
-                            <InputPassword name="password" />
-                        </FormRow>
+            <RegistrationFormPaper className="RegistrationForm" elevation={5}>
+                <RegistrationFormContainer maxWidth="lg">
+                    <Typography variant="h4">Регистрация</Typography>
+                    <form onSubmit={this.register} data-testid="RegistrationForm-form">
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            type="email"
+                            label="Адрес электронной почты"
+                            name="email"
+                        />
+                        <FlexRow>
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                label="Имя"
+                                name="firstName"
+                            />
+                            <FlexRowSpacer />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                label="Фамилия"
+                                name="lastName"
+                            />
+                        </FlexRow>
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            type="password"
+                            label="Пароль"
+                            name="password"
+                        />
 
-                        <button tabIndex="0" type="submit">
-                            <span className="label">Зарегистрироваться</span>
-                        </button>
+                        <SubmitButton data-testid="RegistrationForm-SubmitButton">Зарегистрироваться</SubmitButton>
                     </form>
-                    <LoginLink changeTab={this.props.changeTab} />
-                </div>
-            </div>
+                    <LoginLink />
+                </RegistrationFormContainer>
+            </RegistrationFormPaper>
         );
     }
 }
+
+export default withNavigation(withAuth(RegistrationForm));

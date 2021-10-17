@@ -1,52 +1,89 @@
 import React from "react";
+import PropTypes from "prop-types";
 
-import FormRow from "../form/FormRow/FormRow";
-import InputText from "../form/InputText/InputText";
-import InputPassword from "../form/InputPassword/InputPassword";
 import RegistrationLink from "./RegistrationLink/RegistrationLink";
+import SubmitButton from "../SubmitButton/SubmitButton";
 
 import "./LoginForm.css";
+import { styled, Container, Paper, TextField, Typography } from "@material-ui/core";
+import { withAuth } from "../../contexts/AuthContext/AuthContext";
+import { withNavigation } from "../../contexts/NavigationContext/NavigationContext";
 
-export default class LoginForm extends React.Component {
-    constructor(props) {
-        super(props);
+const LoginFormPaper = styled(Paper)({
+    width: "520px",
+    padding: "48px 0",
+    borderRadius: "20px"
+});
 
-        this.onSubmit = this.onSubmit.bind(this);
+const LoginFormContainer = styled(Container)({
+    display: "flex",
+    padding: "0 102px 0 98px",
+    alignItems: "center",
+    flexDirection: "column"
+});
+
+export class LoginForm extends React.Component {
+    static propTypes = {
+        isLoggedIn: PropTypes.bool,
+        logIn: PropTypes.func,
+        navigateTo: PropTypes.func.isRequired
     }
 
-    onSubmit(event) {
+    componentDidUpdate() {
+        if (this.props.isLoggedIn) {
+            this.props.navigateTo("Map");
+        }
+    }
+
+    authenticate = event => {
         event.preventDefault();
 
         const email = event.target.email.value;
         const password = event.target.password.value;
-        console.log(email, password);
-
-        if (!email || !password || typeof this.props.onLoggedIn !== "function") {
+        if (!email || !password || typeof this.props.logIn !== "function") {
             return ;
         }
 
-        this.props.onLoggedIn({ email });
+        this.props.logIn(email, password);
     }
 
     render() {
+        if (this.props.isLoggedIn) {
+            return null;
+        }
+
         return (
-            <div className="LoginForm">
-                <div className="LoginForm-content">
-                    <h4>Войти</h4>
-                    <form onSubmit={this.onSubmit}>
-                        <FormRow>
-                            <InputText type="email" label="Имя пользователя" name="email" placeholder="email@example.com" />
-                        </FormRow>
-                        <FormRow>
-                            <InputPassword name="password" />
-                        </FormRow>
-                        <button tabIndex="0" type="submit">
-                            <span className="label">Войти</span>
-                        </button>
+            <LoginFormPaper className="LoginForm" elevation={5}>
+                <LoginFormContainer maxWidth="lg">
+                    <Typography variant="h4">Войти</Typography>
+                    <form onSubmit={this.authenticate} data-testid="LoginForm-form">
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            type="email"
+                            label="Имя пользователя"
+                            name="email"
+                            placeholder="email@example.com"
+                            data-testid="TextField-email"
+                        />
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            type="password"
+                            label="Пароль"
+                            name="password"
+                            placeholder="*********"
+                            data-testid="TextField-password"
+                        />
+                        <SubmitButton data-testid="LoginForm-SubmitButton">Войти</SubmitButton>
                     </form>
-                    <RegistrationLink changeTab={this.props.changeTab} />
-                </div>
-            </div>
+                    <RegistrationLink />
+                </LoginFormContainer>
+            </LoginFormPaper>
         );
     }
 }
+
+export default withNavigation(withAuth(LoginForm));

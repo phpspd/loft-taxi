@@ -11,7 +11,7 @@ export default class Registration extends React.Component {
             <div className="Registration">
                 <AsideLogo />
                 <div className="registration-form-container">
-                    <RegistrationForm onSignedUp={this.props.onSignedUp} changeTab={this.props.changeTab} />
+                    <RegistrationForm />
                 </div>
             </div>
         );
