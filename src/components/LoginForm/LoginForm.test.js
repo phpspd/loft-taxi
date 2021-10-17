@@ -14,11 +14,14 @@ describe("LoginForm", () => {
         mockLogIn.mockClear();*/
     });
 
-    it("has form", () => {
+    it("renders correct", () => {
         const { getByTestId } = render(<LoginForm isLoggedIn={false} navigateTo={mockNavigateTo} logIn={mockLogIn} />);
 
         const form = getByTestId("LoginForm-form");
         expect(form).toBeInTheDocument();
+        
+        const submitButton = getByTestId("LoginForm-SubmitButton");
+        expect(submitButton).toBeInTheDocument();
     });
 
     it("calls logIn on submit if email and password set", () => {

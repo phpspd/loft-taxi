@@ -14,10 +14,10 @@ const useStyles = makeStyles({
     }
 });
 
-const SubmitButton = props => {
+const SubmitButton = ({ children, ...rest }) => {
     const classes = useStyles();
-    return <Button className={classes.root} variant="contained" type="submit" color="primary" fullWidth={true}>{props.children}</Button>;
-}
+    return <Button className={classes.root} variant="contained" type="submit" color="primary" fullWidth={true} {...rest}>{children}</Button>;
+};
 
 SubmitButton.propTypes = {
     children: PropTypes.oneOfType([

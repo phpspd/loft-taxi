@@ -91,7 +91,7 @@ export class RegistrationForm extends React.Component {
                             name="password"
                         />
 
-                        <SubmitButton>Зарегистрироваться</SubmitButton>
+                        <SubmitButton data-testid="RegistrationForm-SubmitButton">Зарегистрироваться</SubmitButton>
                     </form>
                     <LoginLink />
                 </RegistrationFormContainer>

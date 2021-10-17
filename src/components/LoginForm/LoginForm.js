@@ -77,7 +77,7 @@ export class LoginForm extends React.Component {
                             placeholder="*********"
                             data-testid="TextField-password"
                         />
-                        <SubmitButton>Войти</SubmitButton>
+                        <SubmitButton data-testid="LoginForm-SubmitButton">Войти</SubmitButton>
                     </form>
                     <RegistrationLink />
                 </LoginFormContainer>
