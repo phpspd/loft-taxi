@@ -6,8 +6,9 @@ import SubmitButton from "../SubmitButton/SubmitButton";
 
 import "./LoginForm.css";
 import { styled, Container, Paper, TextField, Typography } from "@material-ui/core";
-import { withAuth } from "../../contexts/AuthContext/AuthContext";
-import { withNavigation } from "../../contexts/NavigationContext/NavigationContext";
+
+import { authRequest, getLoginError } from "../../modules/user";
+import { connect } from "react-redux";
 
 const LoginFormPaper = styled(Paper)({
     width: "520px",
@@ -24,15 +25,7 @@ const LoginFormContainer = styled(Container)({
 
 export class LoginForm extends React.Component {
     static propTypes = {
-        isLoggedIn: PropTypes.bool,
-        logIn: PropTypes.func,
-        navigateTo: PropTypes.func.isRequired
-    }
-
-    componentDidUpdate() {
-        if (this.props.isLoggedIn) {
-            this.props.navigateTo("Map");
-        }
+        logIn: PropTypes.func.isRequired
     }
 
     authenticate = event => {
@@ -40,7 +33,7 @@ export class LoginForm extends React.Component {
 
         const email = event.target.email.value;
         const password = event.target.password.value;
-        if (!email || !password || typeof this.props.logIn !== "function") {
+        if (!email || !password) {
             return ;
         }
 
@@ -48,10 +41,6 @@ export class LoginForm extends React.Component {
     }
 
     render() {
-        if (this.props.isLoggedIn) {
-            return null;
-        }
-
         return (
             <LoginFormPaper className="LoginForm" elevation={5}>
                 <LoginFormContainer maxWidth="lg">
@@ -66,6 +55,7 @@ export class LoginForm extends React.Component {
                             name="email"
                             placeholder="email@example.com"
                             data-testid="TextField-email"
+                            error={this.props.hasError}
                         />
                         <TextField
                             margin="normal"
@@ -76,6 +66,7 @@ export class LoginForm extends React.Component {
                             name="password"
                             placeholder="*********"
                             data-testid="TextField-password"
+                            error={this.props.hasError}
                         />
                         <SubmitButton data-testid="LoginForm-SubmitButton">Войти</SubmitButton>
                     </form>
@@ -86,4 +77,15 @@ export class LoginForm extends React.Component {
     }
 }
 
-export default withNavigation(withAuth(LoginForm));
+const mapStateToProps = state => ({
+    hasError: !!getLoginError(state)
+});
+
+const mapDispatchToProps = {
+    logIn: (email, password) => authRequest({ email, password })
+};
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(LoginForm);
