@@ -2,7 +2,7 @@ import React from 'react';
 
 import Header from './components/Header/Header';
 import Login from './components/Login/Login';
-import MapPage from './components/MapPage/MapPage';
+import Map from './components/Map/Map';
 import Profile from './components/Profile/Profile';
 import Registration from './components/Registration/Registration';
 import { Route, Switch, Redirect } from 'react-router-dom';
@@ -34,11 +34,12 @@ export class App extends React.Component {
                 { this.props.isLoggedIn ? <Header /> : null }
                 <Switch>
                     <Route path="/login" component={Login} />
-                    <PrivateRoute path="/map" component={MapPage} />
-                    <PrivateRoute path="/profile" component={Profile} />
+                    <PrivateRoute path="/map" component={Map} />
+                    <PrivateRoute path="/profile" component={Map} />
                     <Route path="/registration" component={Registration} />
                     <Redirect to="/login" />
                 </Switch>
+                <PrivateRoute path="/profile" component={Profile} />
             </div>
         );
     }

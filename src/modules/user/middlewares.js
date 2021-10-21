@@ -1,3 +1,4 @@
+import { getRequest as getProfile } from "../profile";
 import {
     authRequest,
     authSuccess,
@@ -8,7 +9,6 @@ import {
 } from "./actions";
 
 export const authRequestMiddleware = store => next => action => {
-    console.log(action);
     if (action.type === authRequest.toString()) {
         const { email, password } = action.payload;
         fetch("https://loft-taxi.glitch.me/auth", {
@@ -29,6 +29,9 @@ export const authRequestMiddleware = store => next => action => {
         }).catch(error => {
             store.dispatch(authFailure(error));
         });
+    } else if ([authSuccess.toString(), registrationSuccess.toString()].includes(action.type)) {
+        const token = action.payload;
+        store.dispatch(getProfile({ token }));
     }
 
     return next(action);

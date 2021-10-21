@@ -9,7 +9,7 @@ const FlexRow = props => {
             : [ props.children ];
 
     return (
-        <div className="FlexRow">
+        <div className={props.className ? props.className + " FlexRow" : "FlextRow"}>
             {children}
         </div>
     );
