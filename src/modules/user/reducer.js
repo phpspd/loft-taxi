@@ -24,10 +24,10 @@ const isLoggedIn = handleActions(
 const token = handleActions(
     {
         [authRequest]: () => null,
-        [authSuccess]: (_state, action) => action.payload,
+        [authSuccess]: (_state, action) => action.payload || null,
         [authLogOut]: () => null,
         [registrationRequest]: () => null,
-        [registrationSuccess]: (_state, action) => action.payload
+        [registrationSuccess]: (_state, action) => action.payload || null
     },
     null
 );

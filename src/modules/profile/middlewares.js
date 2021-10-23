@@ -14,9 +14,9 @@ export const getRequestMiddleware = store => next => action => {
             }).catch(error => {
                 store.dispatch(getFailure(error));
             });
+    } else {
+        return next(action);
     }
-
-    return next(action);
 };
 
 export const saveRequestMiddleware = store => next => action => {
@@ -43,7 +43,7 @@ export const saveRequestMiddleware = store => next => action => {
             }).catch(error => {
                 store.dispatch(saveFailure(error));
             });
+    } else {
+        return next(action);
     }
-
-    return next(action);
 };

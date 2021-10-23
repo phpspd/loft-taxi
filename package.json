@@ -49,8 +49,7 @@
     "@testing-library/react-hooks": "^7.0.2",
     "commitizen": "^4.2.4",
     "cz-conventional-changelog": "^3.3.0",
-    "enzyme": "^3.11.0",
-    "enzyme-adapter-react-16": "^1.15.6",
+    "history": "^5.0.1",
     "react-test-renderer": "^17.0.2",
     "web-vitals": "^2.1.0"
   },

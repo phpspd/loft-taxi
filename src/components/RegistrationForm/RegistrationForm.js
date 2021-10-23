@@ -40,7 +40,7 @@ export class RegistrationForm extends React.Component {
             return ;
         }
 
-        this.props.register(email, password, firstName, lastName);
+        this.props.register(email, password, lastName, firstName);
     }
 
     render() {

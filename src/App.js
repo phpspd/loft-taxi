@@ -21,11 +21,11 @@ export class App extends React.Component {
     }
 
     componentDidUpdate() {
-        document.title = this.title;
+        //document.title = this.title;
     }
 
     get title() {
-        return "🚖 Loft-Taxi " + this.props.currentPage;
+        return "🚖 Loft-Taxi";
     }
 
     render() {

@@ -33,18 +33,14 @@ export class Profile extends React.Component {
     }
 
     onCardNumberChange = (e) => {
-        const { inputType, data: pushedSymbol } = e.nativeEvent;
         const value = e.target.value;
 
-        if (inputType === "insertText" && !/\d/.test(pushedSymbol)) {
+        if (/[^\d ]/.test(value)) {
             return;
         }
-        if (value.length > 19) {
-            return;
-        }
-        
-        this.setState({
-            cardNumber: value.split("").reduce((acc, sym) => 
+
+        const formattedValue = value.split("").reduce(
+            (acc, sym) => 
                 acc + (
                     sym === " "
                     ? ""
@@ -54,36 +50,27 @@ export class Profile extends React.Component {
                         : ""
                     ) + sym
                 ), ""
-            )
+        )
+        
+        this.setState({
+            cardNumber: formattedValue.substr(0, 19)
         });
     }
 
     onExpiryDateChange = (e) => {
-        const { inputType, data: pushedSymbol } = e.nativeEvent;
-        const value = e.target.value;
-
-        if (inputType === "insertText" && !/[\d/]/.test(pushedSymbol)) {
-            return e.preventDefault();
-        }
-        if (value.length > 5) {
-            return;
-        }
+        let value = e.target.value;
+        
+        value = value.replace(/\D/g, "");
+        
+        const formattedValue = value.substr(0, 2) + (value.length > 2 ? "/" : "") + value.substr(2, 2);
 
         this.setState({
-            expiryDate: value.substr(0, 2) + (value.length === 3 && value.indexOf("/") === -1 ? "/" : "") + value.substr(2)
+            expiryDate: formattedValue.substr(0, 5)
         });
     }
 
     onCvcChange = (e) => {
-        const { inputType, data: pushedSymbol } = e.nativeEvent;
-        const value = e.target.value;
-
-        if (inputType === "insertText" && !/\d/.test(pushedSymbol)) {
-            return e.preventDefault();
-        }
-        if (value.length > 3) {
-            return;
-        }
+        const value = e.target.value.replace(/\D/g, "").substr(0, 3);
 
         this.setState({
             cvc: value
@@ -97,7 +84,7 @@ export class Profile extends React.Component {
             this.state.cardNumber,
             convertExpiryDateToDate(this.state.expiryDate),
             this.state.cvc,
-            this.state.token,
+            this.props.token,
         );
     }
 
@@ -123,7 +110,7 @@ export class Profile extends React.Component {
         return (
             <>
                 <Typography variant="body1" align="center">Введите платежные данные</Typography>
-                <form onSubmit={this.submit}>
+                <form onSubmit={this.submit} data-testid="Profile-form">
                     <div className="form-container">
                         <div className="left">
                                 <TextField
@@ -134,6 +121,7 @@ export class Profile extends React.Component {
                                     required
                                     onChange={this.onCardHolderChange}
                                     value={this.state.cardHolder}
+                                    inputProps={{"data-testid": "cardHolder"}}
                                 ></TextField>
                                 <TextField
                                     className="margin-bottom full-width"
@@ -144,6 +132,7 @@ export class Profile extends React.Component {
                                     maxLength="19"
                                     onChange={this.onCardNumberChange}
                                     value={this.state.cardNumber}
+                                    inputProps={{"data-testid": "cardNumber"}}
                                 ></TextField>
                                 <FlexRow className="full-width">
                                     <TextField
@@ -154,6 +143,7 @@ export class Profile extends React.Component {
                                         required
                                         onChange={this.onExpiryDateChange}
                                         value={this.state.expiryDate}
+                                        inputProps={{"data-testid": "expiryDate"}}
                                     ></TextField>
                                     <FlexRowSpacer />
                                     <TextField
@@ -165,6 +155,7 @@ export class Profile extends React.Component {
                                         maxLength="3"
                                         onChange={this.onCvcChange}
                                         value={this.state.cvc}
+                                        inputProps={{"data-testid": "cvc"}}
                                     ></TextField>
                                 </FlexRow>
                         </div>
@@ -175,7 +166,7 @@ export class Profile extends React.Component {
                                     <Typography variant="body1">{this.expiryDate}</Typography>
                                 </div>
                                 <div>
-                                    <Typography className="card-number" variant="body1">{this.state.cardNumber || "0000 0000 0000 0000"}</Typography>
+                                    <Typography className="card-number" variant="body1" data-testid="placeCardNumber">{this.state.cardNumber || "0000 0000 0000 0000"}</Typography>
                                 </div>
                                 <div className="card-bottom">
                                     <ChipIcon />

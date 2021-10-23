@@ -1,24 +1,37 @@
 import React from 'react';
 import { RegistrationLink } from "./RegistrationLink";
 import { render, fireEvent } from "@testing-library/react";
+import { Router } from 'react-router';
+import { createMemoryHistory } from 'history';
 
 describe("RegistrationLink", () => {
-    const mockNavigateTo = jest.fn();
+    let history;
+
+    beforeEach(() => {
+        history = createMemoryHistory();
+    });
 
     it("has anchor", () => {
-        const { getByTestId } = render(<RegistrationLink navigateTo={mockNavigateTo} />);
+        const { getByTestId } = render(
+            <Router history={history}>
+                <RegistrationLink />
+            </Router>
+        );
 
         const anchor = getByTestId("RegistrationLink-anchor");
         expect(anchor).toBeInTheDocument();
     });
 
     it("navigates to Registration if clicked", () => {
-        const { getByTestId } = render(<RegistrationLink navigateTo={mockNavigateTo} />);
+        const { getByTestId } = render(
+            <Router history={history}>
+                <RegistrationLink />
+            </Router>
+        );
 
         const anchor = getByTestId("RegistrationLink-anchor");
         fireEvent.click(anchor);
 
-        expect(mockNavigateTo.mock.calls.length).toBe(1);
-        expect(mockNavigateTo.mock.calls[0][0]).toBe("Registration");
+        expect(history.location.pathname).toEqual("/registration");
     });
 });

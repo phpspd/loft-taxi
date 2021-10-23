@@ -32,9 +32,9 @@ export const authRequestMiddleware = store => next => action => {
     } else if ([authSuccess.toString(), registrationSuccess.toString()].includes(action.type)) {
         const token = action.payload;
         store.dispatch(getProfile({ token }));
+    } else {
+        return next(action);
     }
-
-    return next(action);
 };
 
 export const registrationRequestMiddleware = store => next => action => {
@@ -60,7 +60,7 @@ export const registrationRequestMiddleware = store => next => action => {
         }).catch(error => {
             store.dispatch(registrationFailure(error));
         });
+    } else {
+        return next(action);
     }
-
-    return next(action);
 }

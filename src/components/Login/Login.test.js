@@ -1,21 +1,68 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import Login from "./Login";
-import { shallow } from "enzyme";
-import AsideLogo from '../AsideLogo/AsideLogo';
-import LoginForm from '../LoginForm/LoginForm';
+import { Provider } from 'react-redux';
+import { createMemoryHistory } from "history";
+import { Router } from 'react-router';
+import { render } from '@testing-library/react';
 
 jest.mock("../AsideLogo/AsideLogo", () => () => "AsideLogo");
-jest.mock("../LoginForm/LoginForm", () => () => "LoginForm");
+jest.mock("../LoginForm/LoginForm", () => () => "Login Form");
 
-it("renders without crashing", () => {
-    const div = document.createElement("div");
-    ReactDOM.render(<Login />, div);
-    ReactDOM.unmountComponentAtNode(div);
-});
+describe("Login", () => {
+    let history;
+    const getStore = (state) => {
+        state = state || {
+            user: {},
+            profile: {}
+        };
+        
+        return {
+            getState: () => ({
+                user: state.user || {},
+                profile: state.profile || {}
+            }),
+            subscribe: jest.fn(),
+            dispatch: jest.fn()
+        }
+    };
 
-it("renders shallow", () => {
-    const wrapper = shallow(<Login />);
-    expect(wrapper.contains(<AsideLogo />)).toEqual(true);
-    expect(wrapper.contains(<LoginForm />)).toEqual(true);
-});
+    beforeEach(() => {
+        history = createMemoryHistory();
+    });
+
+    it("redirects to /map if logged in", () => {
+        expect(history.location.pathname).toEqual("/");
+
+        render(
+            <Router history={history}>
+                <Provider store={getStore({
+                    user: {
+                        isLoggedIn: true
+                    }
+                })}>
+                    <Login />
+                </Provider>
+            </Router>
+        );
+
+        expect(history.location.pathname).toEqual("/map");
+    });
+
+    it("renders LoginForm if not logged in", () => {
+        const store = getStore({
+            user: {
+                isLoggedIn: false
+            }
+        });
+
+        const { getByText } = render(
+            <Router history={history}>
+                <Provider store={store}>
+                    <Login />
+                </Provider>
+            </Router>
+        );
+
+        expect(getByText("Login Form")).toBeInTheDocument();
+    });
+})
