@@ -7,8 +7,8 @@ import LoginLink from "./LoginLink/LoginLink";
 import "./RegistrationForm.css";
 import { Container, Paper, styled, TextField, Typography } from "@material-ui/core";
 import SubmitButton from "../SubmitButton/SubmitButton";
-import { withAuth } from "../../contexts/AuthContext/AuthContext";
-import { withNavigation } from "../../contexts/NavigationContext/NavigationContext";
+import { connect } from "react-redux";
+import { registrationRequest, getRegistrationError } from "../../modules/user";
 
 const RegistrationFormPaper = styled(Paper)({
     width: "520px",
@@ -25,15 +25,7 @@ const RegistrationFormContainer = styled(Container)({
 
 export class RegistrationForm extends React.Component {
     static propTypes = {
-        isLoggedIn: PropTypes.bool,
-        navigateTo: PropTypes.func.isRequired,
-        logIn: PropTypes.func
-    }
-
-    componentDidUpdate() {
-        if (this.props.isLoggedIn) {
-            this.props.navigateTo("Map");
-        }
+        register: PropTypes.func.isRequired
     }
 
     register = event => {
@@ -44,11 +36,11 @@ export class RegistrationForm extends React.Component {
         const firstName = event.target.firstName.value;
         const password = event.target.password.value;
 
-        if (!email || !lastName || !firstName || !password || typeof this.props.logIn !== "function") {
+        if (!email || !lastName || !firstName || !password) {
             return ;
         }
 
-        this.props.logIn(email, password);
+        this.props.register(email, password, lastName, firstName);
     }
 
     render() {
@@ -64,6 +56,7 @@ export class RegistrationForm extends React.Component {
                             type="email"
                             label="Адрес электронной почты"
                             name="email"
+                            error={this.props.hasError}
                         />
                         <FlexRow>
                             <TextField
@@ -72,6 +65,7 @@ export class RegistrationForm extends React.Component {
                                 fullWidth
                                 label="Имя"
                                 name="firstName"
+                                error={this.props.hasError}
                             />
                             <FlexRowSpacer />
                             <TextField
@@ -80,6 +74,7 @@ export class RegistrationForm extends React.Component {
                                 fullWidth
                                 label="Фамилия"
                                 name="lastName"
+                                error={this.props.hasError}
                             />
                         </FlexRow>
                         <TextField
@@ -89,6 +84,7 @@ export class RegistrationForm extends React.Component {
                             type="password"
                             label="Пароль"
                             name="password"
+                            error={this.props.hasError}
                         />
 
                         <SubmitButton data-testid="RegistrationForm-SubmitButton">Зарегистрироваться</SubmitButton>
@@ -100,4 +96,15 @@ export class RegistrationForm extends React.Component {
     }
 }
 
-export default withNavigation(withAuth(RegistrationForm));
+const mapStateToProps = state => ({
+    hasError: !!getRegistrationError(state)
+});
+
+const mapDispatchToProps = {
+    register: (email, password, surname, name) => registrationRequest({ email, password, surname, name })
+};
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(RegistrationForm);

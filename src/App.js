@@ -2,40 +2,56 @@ import React from 'react';
 
 import Header from './components/Header/Header';
 import Login from './components/Login/Login';
-import MapPage from './components/MapPage/MapPage';
+import Map from './components/Map/Map';
 import Profile from './components/Profile/Profile';
 import Registration from './components/Registration/Registration';
-import { withAuth } from './contexts/AuthContext/AuthContext';
-import { withNavigation } from './contexts/NavigationContext/NavigationContext';
+import { Route, Switch, Redirect } from 'react-router-dom';
+import PrivateRoute from './components/PrivateRoute/PrivateRoute';
+import PropTypes from "prop-types";
+import { connect } from 'react-redux';
+import { getIsLoggedIn } from './modules/user';
 
 export class App extends React.Component {
+    static propTypes = {
+        isLoggedIn: PropTypes.bool
+    }
+
     componentDidMount() {
         document.title = this.title;
     }
 
     componentDidUpdate() {
-        document.title = this.title;
+        //document.title = this.title;
     }
 
     get title() {
-        return "🚖 Loft-Taxi " + this.props.currentPage;
+        return "🚖 Loft-Taxi";
     }
 
     render() {
         return (
             <div className="App">
                 { this.props.isLoggedIn ? <Header /> : null }
-                {
-                    {
-                        Login: <Login />,
-                        Map: <MapPage />,
-                        Profile: <Profile />,
-                        Registration: <Registration />
-                    }[this.props.currentPage]
-                }
+                <Switch>
+                    <Route path="/login" component={Login} />
+                    <PrivateRoute path="/map" component={Map} />
+                    <PrivateRoute path="/profile" component={Map} />
+                    <Route path="/registration" component={Registration} />
+                    <Redirect to="/login" />
+                </Switch>
+                <PrivateRoute path="/profile" component={Profile} />
             </div>
         );
     }
 }
 
-export default withNavigation(withAuth(App));
+const mapStateToProps = state => ({
+    isLoggedIn: getIsLoggedIn(state)
+});
+
+const mapDispatchToProps = {};
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(App);

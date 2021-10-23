@@ -1,25 +1,29 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
 
 import { theme } from "loft-taxi-mui-theme";
 import { MuiThemeProvider } from "@material-ui/core/styles";
-import { AuthProvider } from './contexts/AuthContext/AuthContext';
-import { NavigationProvider } from './contexts/NavigationContext/NavigationContext';
+import { BrowserRouter } from "react-router-dom";
+
+import { Provider } from "react-redux";
+import createStore from "./store";
+
+const store = createStore();
 
 ReactDOM.render(
     <React.StrictMode>
-        <MuiThemeProvider theme={theme}>
-            <AuthProvider>
-                <NavigationProvider>
+        <Provider store={store}>
+            <MuiThemeProvider theme={theme}>
+                <BrowserRouter>
                     <App />
-                </NavigationProvider>
-            </AuthProvider>
-        </MuiThemeProvider>
+                </BrowserRouter>
+            </MuiThemeProvider>
+        </Provider>
     </React.StrictMode>,
-    document.getElementById('root')
+    document.getElementById("root")
 );
 
 // If you want to start measuring performance in your app, pass a function

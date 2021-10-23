@@ -5,54 +5,62 @@ import "./Navigation.css";
 
 import { Button, Toolbar } from '@material-ui/core';
 import NavigationLogo from './NavigationLogo/NavigationLogo';
-import { withAuth } from '../../contexts/AuthContext/AuthContext';
-import { withNavigation } from '../../contexts/NavigationContext/NavigationContext';
+import { Link, NavLink } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { authLogOut } from '../../modules/user';
 
 export const tabs = {
     Map: {
-        href: "/main/order",
+        href: "/map",
         caption: "Карта"
     },
     Profile: {
-        href: "/main/profile",
+        href: "/profile",
         caption: "Профиль"
     }
 }
 
 export class Navigation extends React.Component {
     static propTypes = {
-        currentPage: PropTypes.oneOf(Object.keys(tabs)),
-        navigateTo: PropTypes.func,
         logOut: PropTypes.func
     }
 
-    logOut = e => {
-        e.preventDefault();
-        if (typeof this.props.logOut === "function") {
-            this.props.logOut();
-            this.props.navigateTo("Login");
-        }
-    }
-
     render() {
-        const { currentPage } = this.props;
         return (
             <Toolbar className="Navigation" variant="regular">
                 <NavigationLogo />
                 {Object.keys(tabs).map((tabKey) => (
-                    <Button
-                        key={tabKey}
-                        data-page={tabKey}
-                        href={tabs[tabKey].href}
-                        className={currentPage === tabKey ? "active": null}
-                        onClick={(e) => { e.preventDefault(); this.props.navigateTo(tabKey); }}
-                        color="inherit"
-                    >{tabs[tabKey].caption}</Button>
+                        <NavLink
+                            key={tabKey}
+                            to={tabs[tabKey].href}
+                            activeClassName="active"
+                            className="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-colorInherit"
+                        >
+                            <Button color="inherit">{tabs[tabKey].caption}</Button>
+                        </NavLink>
                 ))}
-                <Button href="/main/logout" name="logout" onClick={this.logOut} color="inherit">Выйти</Button>
+                <Link
+                    to="/logout"
+                    name="logout"
+                    onClick={this.props.logOut}
+                    className="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-colorInherit"
+                >
+                    <Button color="inherit">Выйти</Button>
+                </Link>
             </Toolbar>
         );
     }
 }
 
-export default withNavigation(withAuth(Navigation));
+const mapStateToProps = state => ({
+
+});
+
+const mapDispatchToProps = {
+    logOut: authLogOut
+};
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(Navigation);

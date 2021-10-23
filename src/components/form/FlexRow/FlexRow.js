@@ -3,13 +3,9 @@ import PropTypes from "prop-types";
 
 import "./FlexRow.css"
 
-const FlexRow = props => {
-    const children = !props.children || Array.isArray(props.children)
-            ? props.children
-            : [ props.children ];
-
+const FlexRow = ({ children, className }) => {
     return (
-        <div className="FlexRow">
+        <div className={className ? className + " FlexRow" : "FlexRow"}>
             {children}
         </div>
     );

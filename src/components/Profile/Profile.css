@@ -1,0 +1,129 @@
+.Profile {
+    height: calc(100vh - 73px);
+    position: relative;
+    pointer-events: none;
+}
+
+.Profile .pointer-events {
+    pointer-events: all;
+}
+
+.Profile .shadow {
+    position: absolute;
+    inset: 0px;
+    background-color: rgb(28, 26, 25);
+    opacity: 0.5;
+}
+
+.Profile .form-paper {
+    top: 50%;
+    left: 50%;
+    padding: 60px 44px;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    border-radius: 10px;
+}
+
+.Profile .form-paper p {
+    margin-top: 16px;
+}
+
+.Profile h4 {
+    font-weight: 700;
+}
+
+.Profile .form-container {
+    display: flex;
+    padding: 40px 0;
+}
+
+.Profile .form-container .left {
+    flex: 1 1 0;
+    margin-right: 100px;
+}
+
+.Profile .form-container .margin-bottom {
+    margin-bottom: 24px;
+}
+
+.Profile .form-container .full-width {
+    width: 355px;
+}
+
+.Profile .form-container .margin-right {
+    margin-right: 35px;
+}
+
+.Profile .form-container .right {
+    flex: 1 1 0px;
+}
+
+.Profile .form-container .card {
+    width: 347px;
+    height: 182px;
+    display: flex;
+    padding: 18px 28px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.Profile .form-container .card .card-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.Profile .form-container .card .card-number {
+    font-size: 22px;
+    line-height: 1.2;
+}
+
+.Profile .form-container .card .card-bottom {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.Profile .form-container .card .card-bottom .mc-icon {
+    width: 38px;
+    height: 28px;
+    display: flex;
+}
+
+.Profile .form-container .card .card-bottom .mc-icon::before,
+.Profile .form-container .card .card-bottom .mc-icon::after {
+    width: 28px;
+    height: 28px;
+    content: '';
+    flex-shrink: 0;
+    border-radius: 50%;
+    mix-blend-mode: multiply;
+    background-color: #f1f1f1;
+}
+
+.Profile .form-container .card .card-bottom .mc-icon::after {
+    margin-left: -10px;
+}
+
+.Profile .button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+.Profile .button-container.margin-top {
+    margin-top: 16px;
+}
+
+.Profile .button-container .btn {
+    width: 350px;
+    font-size: 21px;
+    font-weight: 400;
+    border-radius: 40px;
+    letter-spacing: 0px;
+}
