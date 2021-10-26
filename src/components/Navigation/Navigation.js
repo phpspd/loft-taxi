@@ -30,23 +30,25 @@ export class Navigation extends React.Component {
             <Toolbar className="Navigation" variant="regular">
                 <NavigationLogo />
                 {Object.keys(tabs).map((tabKey) => (
-                        <NavLink
-                            key={tabKey}
-                            to={tabs[tabKey].href}
-                            activeClassName="active"
-                            className="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-colorInherit"
-                        >
-                            <Button color="inherit">{tabs[tabKey].caption}</Button>
-                        </NavLink>
+                    <Button
+                        key={tabKey}
+                        component={NavLink}
+                        to={tabs[tabKey].href}
+                        activeClassName="active"
+                        color="inherit"
+                    >
+                        {tabs[tabKey].caption}
+                    </Button>
                 ))}
-                <Link
+                <Button
+                    component={Link}
                     to="/logout"
                     name="logout"
                     onClick={this.props.logOut}
-                    className="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-colorInherit"
+                    color="inherit"
                 >
-                    <Button color="inherit">Выйти</Button>
-                </Link>
+                    Выйти
+                </Button>
             </Toolbar>
         );
     }

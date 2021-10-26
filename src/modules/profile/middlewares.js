@@ -1,10 +1,10 @@
+import { serverGetCard, serverSaveCard } from "../../api";
 import { getRequest, getSuccess, getFailure, saveFailure, saveRequest, saveSuccess } from "./actions";
 
-export const getRequestMiddleware = store => next => action => {
+export const profileMiddleware = store => next => action => {
     if (action.type === getRequest.toString()) {
         const { token } = action.payload;
-        fetch("https://loft-taxi.glitch.me/card?token=" + token)
-            .then(response => response.json())
+        serverGetCard(token)
             .then(({ cardName, cardNumber, expiryDate, cvc, error }) => {
                 if (error) {
                     store.dispatch(getFailure(error));
@@ -14,26 +14,9 @@ export const getRequestMiddleware = store => next => action => {
             }).catch(error => {
                 store.dispatch(getFailure(error));
             });
-    } else {
-        return next(action);
-    }
-};
-
-export const saveRequestMiddleware = store => next => action => {
-    if (action.type === saveRequest.toString()) {
+    } else if (action.type === saveRequest.toString()) {
         const { cardHolder, cardNumber, expiryDate, cvc, token } = action.payload;
-        fetch("https://loft-taxi.glitch.me/card", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                cardName: cardHolder,
-                cardNumber,
-                expiryDate,
-                cvc,
-                token
-            })
-        })
-            .then(response => response.json())
+        serverSaveCard(cardHolder, cardNumber, expiryDate, cvc, token)
             .then(({ success, error }) => {
                 if (success) {
                     store.dispatch(saveSuccess({ cardHolder, cardNumber, expiryDate, cvc }));
@@ -43,7 +26,6 @@ export const saveRequestMiddleware = store => next => action => {
             }).catch(error => {
                 store.dispatch(saveFailure(error));
             });
-    } else {
-        return next(action);
     }
+    return next(action);
 };
