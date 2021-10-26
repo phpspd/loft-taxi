@@ -1,21 +1,35 @@
-import { authRequestMiddleware, registrationRequestMiddleware } from "./middlewares";
+import { userMiddleware } from "./middlewares";
 import { authRequest, registrationRequest, authSuccess, registrationSuccess } from "./actions";
 import { waitFor } from "@testing-library/react";
+import { serverAuth, serverRegister } from "../../api";
+
+jest.mock("../../api");
 
 describe("module user", () => {
     let dispatch;
-    const mockFetch = function(success) {
-        jest.spyOn(global, "fetch").mockResolvedValue({
-            json: jest.fn().mockResolvedValue({
-                success
-            })
-        });
+    const next = jest.fn();
+    const mockApiSuccess = function() {
+        serverAuth.mockImplementation(async () => ({
+            success: true
+        }));
+        serverRegister.mockImplementation(async () => ({
+            success: true
+        }));
     };
-    const mockFetchThrowsError = function() {
-        jest.spyOn(global, "fetch").mockResolvedValue({
-            json: jest.fn().mockImplementation(() => {
-                throw new Error();
-            })
+    const mockApiFailure = function() {
+        serverAuth.mockImplementation(async () => ({
+            error: true
+        }));
+        serverRegister.mockImplementation(async () => ({
+            error: true
+        }));
+    };
+    const mockApiThrowsError = function() {
+        serverAuth.mockImplementation(async () => {
+            throw new Error();
+        });
+        serverRegister.mockImplementation(async () => {
+            throw new Error();
         });
     };
     const mockUnknownAction = {
@@ -23,7 +37,6 @@ describe("module user", () => {
         token: "testtoken",
         toString: function() { return this.type }
     };
-    const next = jest.fn();
 
     beforeEach(() => {
         dispatch = jest.fn();
@@ -33,26 +46,31 @@ describe("module user", () => {
         jest.restoreAllMocks();
     });
 
-    describe("authRequestMiddleware", () => {
+    describe("userMiddleware", () => {
         describe("AUTH_REQUEST", () => {
-            it("authenticates through fetch", () => {
-                mockFetch();
+            it("authenticates through api", () => {
+                mockApiSuccess();
 
-                const data = { email: "email@test.com", password: "testpassword" };
+                const email = "email@test.com";
+                const password = "testpassword";
     
-                authRequestMiddleware({ dispatch })()(
-                    authRequest(data)
+                userMiddleware({ dispatch })(next)(
+                    authRequest({
+                        email,
+                        password
+                    })
                 );
     
-                expect(fetch).toBeCalled();
-                expect(fetch.mock.calls[0][1].body).toEqual(JSON.stringify(data));
+                expect(serverAuth).toBeCalled();
+                expect(serverAuth.mock.calls[0][0]).toEqual(email);
+                expect(serverAuth.mock.calls[0][1]).toEqual(password);
             });
 
             it("dispatches AUTH_SUCCESS if authenticates", async () => {
-                mockFetch(true);
+                mockApiSuccess();
 
                 await waitFor(() =>
-                    authRequestMiddleware({ dispatch })()(
+                    userMiddleware({ dispatch })(next)(
                         authRequest({})
                     )
                 );
@@ -65,10 +83,10 @@ describe("module user", () => {
             });
 
             it("dispatches AUTH_FAILURE if not authenticates", async () => {
-                mockFetch();
+                mockApiFailure();
                 
                 await waitFor(() =>
-                    authRequestMiddleware({ dispatch })()(
+                    userMiddleware({ dispatch })(next)(
                         authRequest({})
                     )
                 );
@@ -81,10 +99,10 @@ describe("module user", () => {
             });
 
             it("dispatches AUTH_FAILURE if catches error", async () => {
-                mockFetchThrowsError();
+                mockApiThrowsError();
                 
                 await waitFor(() =>
-                    authRequestMiddleware({ dispatch })()(
+                    userMiddleware({ dispatch })(next)(
                         authRequest({})
                     )
                 );
@@ -99,7 +117,7 @@ describe("module user", () => {
 
         describe("AUTH_SUCCESS", () => {
             it("dispatches GET_REQUEST", () => {
-                authRequestMiddleware({ dispatch })()(
+                userMiddleware({ dispatch })(next)(
                     authSuccess("testToken")
                 );
 
@@ -116,7 +134,7 @@ describe("module user", () => {
 
         describe("REGISTRATION_SUCCESS", () => {
             it("dispatches GET_REQUEST", () => {
-                authRequestMiddleware({ dispatch })()(
+                userMiddleware({ dispatch })(next)(
                     registrationSuccess("testToken")
                 );
 
@@ -131,60 +149,36 @@ describe("module user", () => {
             });
         });
 
-        describe("other actions", () => {
-            it("not calls fetch with unknown action", () => {
-                mockFetch();
-    
-                authRequestMiddleware({ dispatch })(next)(
-                    mockUnknownAction
-                );
-    
-                expect(fetch).not.toBeCalled();
-            });
-            
-            it("calls next with unknown action", () => {
-                mockFetch();
-    
-                authRequestMiddleware({ dispatch })(next)(
-                    mockUnknownAction
-                );
-    
-                expect(next).toBeCalledWith(mockUnknownAction);
-            });
-        });
-    });
-    
-    describe("registrationRequestMiddleware", () => {
         describe("REGISTRATION_REQUEST", () => {
-            it("registration through fetch", async () => {
-                mockFetch();
+            it("registration through api", async () => {
+                mockApiSuccess();
 
-                const data = {
-                    email: "email@test.com",
-                    password: "testpassword",
-                    name: "testname",
-                    surname: "testsurname"
-                };
+                const email = "email@test.com";
+                const password = "testpassword";
+                const surname = "testname";
+                const name = "testsurname";
     
-                registrationRequestMiddleware({ dispatch })()(
-                    registrationRequest(data)
+                userMiddleware({ dispatch })(next)(
+                    registrationRequest({
+                        email,
+                        password,
+                        surname,
+                        name
+                    })
                 );
     
-                expect(fetch).toBeCalled();
-                expect(fetch.mock.calls[0][1].body).toEqual(JSON.stringify(data));
+                expect(serverRegister).toBeCalled();
+                expect(serverRegister.mock.calls[0][0]).toEqual(email);
+                expect(serverRegister.mock.calls[0][1]).toEqual(password);
+                expect(serverRegister.mock.calls[0][2]).toEqual(surname);
+                expect(serverRegister.mock.calls[0][3]).toEqual(name);
             });
 
             it("dispatches REGISTRATION_SUCCESS if authenticates", async () => {
-                mockFetch(true);
-
-                jest.spyOn(global, "fetch").mockResolvedValue({
-                    json: jest.fn().mockResolvedValue({
-                        success: true
-                    })
-                });
+                mockApiSuccess();
     
                 await waitFor(() =>
-                    registrationRequestMiddleware({ dispatch })()(
+                    userMiddleware({ dispatch })(next)(
                         registrationRequest({})
                     )
                 );
@@ -197,10 +191,10 @@ describe("module user", () => {
             });
 
             it("dispatches REGISTRATION_FAILURE if not authenticates", async () => {
-                mockFetch();
+                mockApiFailure();
     
                 await waitFor(() =>
-                    registrationRequestMiddleware({ dispatch })()(
+                    userMiddleware({ dispatch })(next)(
                         registrationRequest({})
                     )
                 );
@@ -213,10 +207,10 @@ describe("module user", () => {
             });
 
             it("dispatches REGISTRATION_FAILURE if catches error", async () => {
-                mockFetchThrowsError();
+                mockApiThrowsError();
     
                 await waitFor(() =>
-                    registrationRequestMiddleware({ dispatch })()(
+                userMiddleware({ dispatch })(next)(
                         registrationRequest({})
                     )
                 );
@@ -230,20 +224,21 @@ describe("module user", () => {
         });
 
         describe("other actions", () => {
-            it("not calls fetch with unknown action", () => {
-                mockFetch();
+            it("not calls api with unknown action", () => {
+                mockApiSuccess();
     
-                registrationRequestMiddleware({ dispatch })(next)(
+                userMiddleware({ dispatch })(next)(
                     mockUnknownAction
                 );
     
-                expect(fetch).not.toBeCalled();
+                expect(serverAuth).not.toBeCalled();
+                expect(serverRegister).not.toBeCalled();
             });
             
             it("calls next with unknown action", () => {
-                mockFetch();
+                mockApiSuccess();
     
-                registrationRequestMiddleware({ dispatch })(next)(
+                userMiddleware({ dispatch })(next)(
                     mockUnknownAction
                 );
     

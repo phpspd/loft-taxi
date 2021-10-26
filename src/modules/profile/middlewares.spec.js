@@ -1,14 +1,35 @@
-import { getRequestMiddleware, saveRequestMiddleware } from "./middlewares";
+import { profileMiddleware } from "./middlewares";
 import { getRequest, saveRequest } from "./actions";
 import { waitFor } from "@testing-library/react";
+import { serverGetCard, serverSaveCard } from "../../api";
+
+jest.mock("../../api");
 
 describe("module profile", () => {
     let dispatch;
-    const mockFetchThrowsError = function() {
-        jest.spyOn(global, "fetch").mockResolvedValue({
-            json: jest.fn().mockImplementation(() => {
-                throw new Error();
-            })
+    const next = jest.fn();
+    const mockApiSuccess = function() {
+        serverGetCard.mockImplementation(async () => ({
+            success: true
+        }));
+        serverSaveCard.mockImplementation(async () => ({
+            success: true
+        }));
+    };
+    const mockApiFailure = function() {
+        serverGetCard.mockImplementation(async () => ({
+            error: true
+        }));
+        serverSaveCard.mockImplementation(async () => ({
+            error: true
+        }));
+    };
+    const mockApiThrowsError = function() {
+        serverGetCard.mockImplementation(async () => {
+            throw new Error();
+        });
+        serverSaveCard.mockImplementation(async () => {
+            throw new Error();
         });
     };
     const mockUnknownAction = {
@@ -16,7 +37,6 @@ describe("module profile", () => {
         token: "testtoken",
         toString: function() { return this.type }
     };
-    const next = jest.fn();
 
     beforeEach(() => {
         dispatch = jest.fn();
@@ -26,34 +46,29 @@ describe("module profile", () => {
         jest.restoreAllMocks();
     });
 
-    describe("getRequestMiddleware", () => {
-        const mockFetch = function(success) {
-            jest.spyOn(global, "fetch").mockResolvedValue({
-                json: jest.fn().mockResolvedValue({
-                    error: !success
-                })
-            });
-        };
+    describe("profileMiddleware", () => {
 
         describe("GET_REQUEST", () => {
-            it("gets profile details through fetch", () => {
-                mockFetch();
+            it("gets profile details through api", () => {
+                mockApiSuccess();
     
-                const data = { token: "testtoken" };
+                const token = "testtoken";
     
-                getRequestMiddleware({ dispatch })()(
-                    getRequest(data)
+                profileMiddleware({ dispatch })(next)(
+                    getRequest({
+                        token
+                    })
                 );
     
-                expect(fetch).toBeCalled();
-                expect(fetch.mock.calls[0][0]).toContain("token=" + data.token);
+                expect(serverGetCard).toBeCalled();
+                expect(serverGetCard.mock.calls[0][0]).toContain(token);
             });
 
             it("dispatches GET_SUCCESS if gets profile", async () => {
-                mockFetch(true);
+                mockApiSuccess();
 
                 await waitFor(() =>
-                    getRequestMiddleware({ dispatch })()(
+                    profileMiddleware({ dispatch })(next)(
                         getRequest({})
                     )
                 );
@@ -66,10 +81,10 @@ describe("module profile", () => {
             });
 
             it("dispatches GET_FAILURE if not gets profile", async () => {
-                mockFetch();
+                mockApiFailure();
 
                 await waitFor(() =>
-                    getRequestMiddleware({ dispatch })()(
+                    profileMiddleware({ dispatch })(next)(
                         getRequest({})
                     )
                 );
@@ -82,10 +97,10 @@ describe("module profile", () => {
             });
 
             it("dispatches GET_FAILURE if catches error", async () => {
-                mockFetchThrowsError();
+                mockApiThrowsError();
 
                 await waitFor(() =>
-                    getRequestMiddleware({ dispatch })()(
+                    profileMiddleware({ dispatch })(next)(
                         getRequest({})
                     )
                 );
@@ -98,69 +113,41 @@ describe("module profile", () => {
             });
         });
 
-        describe("other actions", () => {
-            it("not calls fetch with unknown action", () => {
-                mockFetch();
-    
-                getRequestMiddleware({ dispatch })(next)(
-                    mockUnknownAction
-                );
-    
-                expect(fetch).not.toBeCalled();
-            });
-            
-            it("calls next with unknown action", () => {
-                mockFetch();
-    
-                getRequestMiddleware({ dispatch })(next)(
-                    mockUnknownAction
-                );
-    
-                expect(next).toBeCalledWith(mockUnknownAction);
-            });
-        });
-    });
-    
-    describe("saveRequestMiddleware", () => {
-        const mockFetch = function(success) {
-            jest.spyOn(global, "fetch").mockResolvedValue({
-                json: jest.fn().mockResolvedValue({
-                    success
-                })
-            });
-        };
-
         describe("saveRequest", () => {
-            it("saves profile details through fetch", async () => {
-                mockFetch();
+            it("saves profile details through api", async () => {
+                mockApiSuccess();
                 
-                const data = {
-                    cardHolder: "testCardHolder",
-                    cardNumber: "testCardNumber",
-                    expiryDate: "testExpiryDate",
-                    cvc: "testCvc",
-                    token: "testToken"
-                };
-                const { cardHolder, ...restData } = data;
+                const cardHolder = "testCardHolder";
+                const cardNumber = "testCardNumber";
+                const expiryDate = "testExpiryDate";
+                const cvc = "testCvc";
+                const token = "testToken";
     
                 await waitFor(() =>
-                    saveRequestMiddleware({ dispatch })()(
-                        saveRequest(data)
+                    profileMiddleware({ dispatch })(next)(
+                        saveRequest({
+                            cardHolder,
+                            cardNumber,
+                            expiryDate,
+                            cvc,
+                            token
+                        })
                     )
                 );
     
-                expect(fetch).toBeCalled();
-                expect(fetch.mock.calls[0][1].body).toEqual(JSON.stringify({
-                    cardName: cardHolder,
-                    ...restData
-                }));
+                expect(serverSaveCard).toBeCalled();
+                expect(serverSaveCard.mock.calls[0][0]).toEqual(cardHolder);
+                expect(serverSaveCard.mock.calls[0][1]).toEqual(cardNumber);
+                expect(serverSaveCard.mock.calls[0][2]).toEqual(expiryDate);
+                expect(serverSaveCard.mock.calls[0][3]).toEqual(cvc);
+                expect(serverSaveCard.mock.calls[0][4]).toEqual(token);
             });
 
             it("dispatches SAVE_SUCCESS if saves profile", async () => {
-                mockFetch(true);
+                mockApiSuccess();
 
                 await waitFor(() =>
-                    saveRequestMiddleware({ dispatch })()(
+                    profileMiddleware({ dispatch })(next)(
                         saveRequest({})
                     )
                 );
@@ -173,10 +160,10 @@ describe("module profile", () => {
             });
 
             it("dispatches SAVE_FAILURE if not gets profile", async () => {
-                mockFetch();
+                mockApiFailure();
 
                 await waitFor(() =>
-                    saveRequestMiddleware({ dispatch })()(
+                    profileMiddleware({ dispatch })(next)(
                         saveRequest({})
                     )
                 );
@@ -189,10 +176,10 @@ describe("module profile", () => {
             });
 
             it("dispatches SAVE_FAILURE if catches error", async () => {
-                mockFetchThrowsError();
+                mockApiThrowsError();
 
                 await waitFor(() =>
-                    saveRequestMiddleware({ dispatch })()(
+                    profileMiddleware({ dispatch })(next)(
                         saveRequest({})
                     )
                 );
@@ -206,20 +193,21 @@ describe("module profile", () => {
         });
 
         describe("other actions", () => {
-            it("not calls fetch with unknown action", () => {
-                mockFetch();
+            it("not calls api with unknown action", () => {
+                mockApiFailure();
     
-                saveRequestMiddleware({ dispatch })(next)(
+                profileMiddleware({ dispatch })(next)(
                     mockUnknownAction
                 );
     
-                expect(fetch).not.toBeCalled();
+                expect(serverGetCard).not.toBeCalled();
+                expect(serverSaveCard).not.toBeCalled();
             });
             
             it("calls next with unknown action", () => {
-                mockFetch();
+                mockApiSuccess();
     
-                saveRequestMiddleware({ dispatch })(next)(
+                profileMiddleware({ dispatch })(next)(
                     mockUnknownAction
                 );
     
