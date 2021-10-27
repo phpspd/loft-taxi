@@ -31,6 +31,9 @@ export default class Map extends React.Component {
             position: "absolute"
         };
 
-        return <div style={style} ref={el => this.mapContainer = el} data-testid="Map" />;
+        return <>
+            <div style={style} ref={el => this.mapContainer = el} data-testid="Map" />
+            <TripSwitcher />
+        </>;
     }
 }
