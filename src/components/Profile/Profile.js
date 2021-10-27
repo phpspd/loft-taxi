@@ -7,7 +7,7 @@ import { ReactComponent as CardLogo } from "./resources/CardLogo.svg";
 
 import "./Profile.css";
 import { connect } from "react-redux";
-import { clearIsSaved, getCardHolder, getCardNumber, getCvc, getExpiryDate, getIsSaved, saveRequest } from "../../modules/profile";
+import { clearIsSaved, getCardHolder, getCardNumber, getCvc, getExpiryDate, getIsSaved, saveRequest, saveFailure, getSaveError } from "../../modules/profile";
 import { getToken } from "../../modules/user";
 import { Link } from "react-router-dom";
 
@@ -79,13 +79,17 @@ export class Profile extends React.Component {
 
     submit = (e) => {
         e.preventDefault();
-        this.props.save(
-            this.state.cardHolder,
-            this.state.cardNumber,
-            convertExpiryDateToDate(this.state.expiryDate),
-            this.state.cvc,
-            this.props.token,
-        );
+        try {
+            this.props.save(
+                this.state.cardHolder,
+                this.state.cardNumber,
+                convertExpiryDateToDate(this.state.expiryDate),
+                this.state.cvc,
+                this.props.token,
+            );
+        } catch(error) {
+            this.props.saveFailure(error);
+        }
     }
 
     render() {
@@ -122,6 +126,7 @@ export class Profile extends React.Component {
                                     onChange={this.onCardHolderChange}
                                     value={this.state.cardHolder}
                                     inputProps={{"data-testid": "cardHolder"}}
+                                    error={!!this.props.saveError}
                                 ></TextField>
                                 <TextField
                                     className="margin-bottom full-width"
@@ -133,6 +138,7 @@ export class Profile extends React.Component {
                                     onChange={this.onCardNumberChange}
                                     value={this.state.cardNumber}
                                     inputProps={{"data-testid": "cardNumber"}}
+                                    error={!!this.props.saveError}
                                 ></TextField>
                                 <FlexRow className="full-width">
                                     <TextField
@@ -144,6 +150,7 @@ export class Profile extends React.Component {
                                         onChange={this.onExpiryDateChange}
                                         value={this.state.expiryDate}
                                         inputProps={{"data-testid": "expiryDate"}}
+                                        error={!!this.props.saveError}
                                     ></TextField>
                                     <FlexRowSpacer />
                                     <TextField
@@ -156,6 +163,7 @@ export class Profile extends React.Component {
                                         onChange={this.onCvcChange}
                                         value={this.state.cvc}
                                         inputProps={{"data-testid": "cvc"}}
+                                        error={!!this.props.saveError}
                                     ></TextField>
                                 </FlexRow>
                         </div>
@@ -206,7 +214,8 @@ const mapStateToProps = state => ({
     expiryDate: convertDateToExpiryDate(getExpiryDate(state)),
     cvc: getCvc(state),
     token: getToken(state),
-    isSaved: getIsSaved(state)
+    isSaved: getIsSaved(state),
+    saveError: getSaveError(state)
 });
 
 function convertExpiryDateToDate(expStr) {
@@ -225,6 +234,7 @@ function convertDateToExpiryDate(dateStr) {
 
 const mapDispatchToProps = {
     save: (cardHolder, cardNumber, expiryDate, cvc, token) => saveRequest({ cardHolder, cardNumber, expiryDate, cvc, token }),
+    saveFailure,
     clearIsSaved
 };
 

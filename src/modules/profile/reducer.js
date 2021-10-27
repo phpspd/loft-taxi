@@ -68,6 +68,8 @@ const getError = handleActions(
 const saveError = handleActions(
     {
         [saveFailure]: (_state, action) => action.payload,
+        [saveRequest]: () => null,
+        [getRequest]: () => null,
     },
     null
 );

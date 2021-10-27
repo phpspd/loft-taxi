@@ -35,7 +35,7 @@ export const userMiddleware = store => next => action => {
                 }
             }).catch(error => {
                 store.dispatch(registrationFailure(error));
-            })
+            });
     } else if ([authSuccess.toString(), registrationSuccess.toString()].includes(action.type)) {
         const token = action.payload;
         store.dispatch(getProfile({ token }));
