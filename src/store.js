@@ -2,6 +2,7 @@ import { createStore, compose, applyMiddleware } from "redux";
 import createSagaMiddleware from "redux-saga";
 import { rootSaga as userRootSaga } from "./modules/user";
 import { rootSaga as profileRootSaga } from "./modules/profile";
+import { rootSaga as routeRootSaga } from "./modules/route";
 import rootReducer from "./modules";
 
 const sagaMiddleware = createSagaMiddleware();
@@ -20,6 +21,7 @@ const createAppStore = () => {
 
     sagaMiddleware.run(userRootSaga);
     sagaMiddleware.run(profileRootSaga);
+    sagaMiddleware.run(routeRootSaga);
 
     withPersistedState(store);
 

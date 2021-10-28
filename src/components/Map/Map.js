@@ -1,7 +1,8 @@
 import React from "react";
-
+import { Route } from 'react-router-dom';
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import TripSwitcher from "../TripSwitcher";
 
 mapboxgl.accessToken = "pk.eyJ1IjoicXVha2VhcmVuYSIsImEiOiJja3VyYXNtYzQxcTVqMnZwMXJobGYweGQ0In0.D18R6ely07uC5nxFK5d0Vg";
 
@@ -33,7 +34,7 @@ export default class Map extends React.Component {
 
         return <>
             <div style={style} ref={el => this.mapContainer = el} data-testid="Map" />
-            <TripSwitcher />
+            <Route path="/map" component={TripSwitcher} />
         </>;
     }
 }

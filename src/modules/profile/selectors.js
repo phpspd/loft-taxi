@@ -4,3 +4,4 @@ export const getExpiryDate = state => state.profile.expiryDate;
 export const getCvc = state => state.profile.cvc;
 export const getSaveError = state => state.profile.saveError;
 export const getIsSaved = state => state.profile.isSaved;
+export const getIsCardFilled = state => state.profile.isCardFilled;

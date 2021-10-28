@@ -2,6 +2,7 @@ import { takeEvery, takeLatest, call, put, fork } from "redux-saga/effects";
 import { authRequest, authSuccess, authFailure, registrationRequest, registrationFailure, registrationSuccess } from "./actions";
 import { serverAuth, serverRegister } from "../../api";
 import { getRequest as getProfile } from "../profile";
+import { addressListRequest } from "../route/actions";
 
 function* authorizationSaga() {
     yield takeEvery(authRequest, function* (action) {
@@ -39,6 +40,7 @@ function* handleSuccess() {
     yield takeLatest([authSuccess, registrationSuccess], function* (action) {
         const token = action.payload;
         yield put(getProfile({ token }));
+        yield put(addressListRequest());
     });
 }
 
