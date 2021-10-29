@@ -105,5 +105,10 @@ const mapStateToProps = state => ({
 });
 
 export default connect(
-    mapStateToProps
+    mapStateToProps,
+    null,
+    null,
+    {
+        forwardRef: true
+    }
 )(Map);
