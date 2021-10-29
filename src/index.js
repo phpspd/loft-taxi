@@ -14,7 +14,7 @@ import createStore from "./store";
 const store = createStore();
 
 ReactDOM.render(
-    <React.StrictMode>
+    //<React.StrictMode>
         <Provider store={store}>
             <MuiThemeProvider theme={theme}>
                 <BrowserRouter>
@@ -22,7 +22,8 @@ ReactDOM.render(
                 </BrowserRouter>
             </MuiThemeProvider>
         </Provider>
-    </React.StrictMode>,
+    //</React.StrictMode>
+    ,
     document.getElementById("root")
 );
 

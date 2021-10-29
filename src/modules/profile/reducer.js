@@ -85,8 +85,8 @@ const isSaved = handleActions(
 
 const isCardFilled = handleActions(
     {
-        [getSuccess]: (_state, { payload: { cardHolder, cardNumber, expiryDate, cvc } }) => !(cardHolder && cardNumber && expiryDate && cvc),
-        [saveSuccess]: (_state, { payload: { cardHolder, cardNumber, expiryDate, cvc } }) => !(cardHolder && cardNumber && expiryDate && cvc),
+        [getSuccess]: (_state, { payload: { cardHolder, cardNumber, expiryDate, cvc } }) => !!(cardHolder && cardNumber && expiryDate && cvc),
+        [saveSuccess]: (_state, { payload: { cardHolder, cardNumber, expiryDate, cvc } }) => !!(cardHolder && cardNumber && expiryDate && cvc),
         [getFailure]: () => false,
         [saveFailure]: () => false
     },

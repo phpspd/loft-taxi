@@ -1,11 +1,11 @@
 import { Box, Button, CardMedia, Container, FormControl, InputLabel, MenuItem, Paper, Select, SvgIcon, Typography } from "@material-ui/core";
 import React from "react";
 import { connect } from "react-redux";
-import { Redirect } from "react-router";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { getIsCardFilled } from "../../modules/profile";
-import { getAddressList } from "../../modules/route";
+import { getAddressList, getRouteRequest, clearRoute, getRoutePoints } from "../../modules/route";
+import PropTypes from "prop-types";
 
 const rates = [
     {
@@ -147,6 +147,13 @@ function ArrowIcon(props) {
 }
 
 class TripSwitcher extends React.Component {
+    static propTypes = {
+        isCardFilled: PropTypes.bool.isRequired,
+        addressList: PropTypes.array.isRequired,
+        getRouteRequest: PropTypes.func.isRequired,
+        clearRoute: PropTypes.func.isRequired
+    }
+
     state = {
         rateIndex: 0
     };
@@ -170,11 +177,21 @@ class TripSwitcher extends React.Component {
     }
 
     order = () => {
+        const { from, to } = this.state;
+        if (this.state.from && this.state.to) {
+            this.props.getRouteRequest({ from, to });
+        }
+    }
 
+    clearRoute = () => {
+        this.props.clearRoute();
+        this.setState({
+            from: "",
+            to: ""
+        });
     }
 
     render() {
-        console.log(this.props.isCardFilled);
         if (!this.props.isCardFilled) {
             return <ComponentWrapper>
                 <ComponentContainer>
@@ -190,7 +207,7 @@ class TripSwitcher extends React.Component {
                 </ComponentContainer>
             </ComponentWrapper>
         }
-        if (this.state.orderDone) {
+        if (this.props.orderDone) {
             return <ComponentWrapper>
                 <ComponentContainer>
                     <FormPaper className="cardNotFilled" elevation={1}>
@@ -198,7 +215,7 @@ class TripSwitcher extends React.Component {
                             <StyledBox>
                                 <NotifyHeader variant="h4" align="left">Заказ размещен</NotifyHeader>
                                 <NotifyText variant="body1" align="left">Ваше такси уже едет к вам. Прибудет приблизительно через 10 минут.</NotifyText>
-                                <FormButton variant="contained" onClick={this.order} color="primary" fullWidth>Сделать новый заказ</FormButton>
+                                <FormButton variant="contained" onClick={this.clearRoute} color="primary" fullWidth>Сделать новый заказ</FormButton>
                             </StyledBox>
                         </NotifyContainer>
                     </FormPaper>
@@ -223,7 +240,7 @@ class TripSwitcher extends React.Component {
                                 this.props.addressList
                                     .filter(val => val !== this.state.to)
                                     .map((val) => (
-                                        <MenuItem value={val}>{val}</MenuItem>
+                                        <MenuItem key={val} value={val}>{val}</MenuItem>
                                     ))
                             }
                             </Select>
@@ -242,7 +259,7 @@ class TripSwitcher extends React.Component {
                                 this.props.addressList
                                     .filter(val => val !== this.state.from)
                                     .map((val) => (
-                                        <MenuItem value={val}>{val}</MenuItem>
+                                        <MenuItem key={val} value={val}>{val}</MenuItem>
                                     ))
                             }
                             </Select>
@@ -269,10 +286,16 @@ class TripSwitcher extends React.Component {
 
 const mapStateToProps = state => ({
     isCardFilled: getIsCardFilled(state),
-    addressList: getAddressList(state)
+    addressList: getAddressList(state),
+    orderDone: !!getRoutePoints(state)
 });
+
+const mapDispatchToProps = {
+    getRouteRequest,
+    clearRoute
+};
 
 export default connect(
     mapStateToProps,
-    //mapDispatchToProps
+    mapDispatchToProps
 )(TripSwitcher);

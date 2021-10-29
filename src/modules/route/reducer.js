@@ -3,7 +3,11 @@ import { combineReducers } from "redux";
 import {
     addressListRequest,
     addressListRequestSuccess,
-    addressListRequestFailure
+    addressListRequestFailure,
+    getRouteRequest,
+    getRouteRequestFailure,
+    getRouteRequestSuccess,
+    clearRoute
 } from "./actions";
 
 const isLoading = handleActions(
@@ -12,7 +16,7 @@ const isLoading = handleActions(
         [addressListRequestSuccess]: () => false,
         [addressListRequestFailure]: () => false
     },
-    ""
+    false
 );
 
 const addressList = handleActions(
@@ -31,8 +35,28 @@ const addressListError = handleActions(
     null
 );
 
+const routeIsLoading = handleActions(
+    {
+        [getRouteRequest]: () => true,
+        [getRouteRequestSuccess]: () => false,
+        [getRouteRequestFailure]: () => false
+    },
+    false
+);
+
+const routePoints = handleActions(
+    {
+        [getRouteRequest]: () => null,
+        [getRouteRequestSuccess]: (_state, action) => action.payload,
+        [clearRoute]: () => null
+    },
+    null
+);
+
 export default combineReducers({
     isLoading,
     addressList,
-    addressListError
+    addressListError,
+    routeIsLoading,
+    routePoints
 });
