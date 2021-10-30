@@ -43,3 +43,14 @@ export const serverSaveCard = (cardName, cardNumber, expiryDate, cvc, token) => 
     })
         .then(response => response.json());
 }
+
+export const serverAddressList = () => {
+    return fetch("https://loft-taxi.glitch.me/addressList")
+        .then(response => response.json());
+}
+
+export const serverGetRoute = (from, to) => {
+    return fetch(`https://loft-taxi.glitch.me/route?address1=${encodeURIComponent(from)}&address2=${encodeURIComponent(to)}`)
+        .then(response => response.json())
+        .then(points => ({ points }));
+}

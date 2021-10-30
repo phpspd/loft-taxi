@@ -2,6 +2,9 @@ import React from "react";
 import Map from "./Map";
 import { render } from "@testing-library/react";
 import mapboxgl from "mapbox-gl";
+import { Provider } from "react-redux";
+import { Router } from "react-router";
+import { createMemoryHistory } from "history";
 
 jest.mock("mapbox-gl", () => ({
     Map: class {
@@ -24,12 +27,45 @@ jest.mock("mapbox-gl", () => ({
         render() {
             return "mapboxgl.Map";
         }
+
+        on() {
+            
+        }
     }
 }));
 
 describe("Map", () => {
+    let history;
+    const getStore = (state) => {
+        state = state || {
+            user: {},
+            profile: {},
+            route: {}
+        };
+        
+        return {
+            getState: () => ({
+                user: state.user || {},
+                profile: state.profile || {},
+                route: state.route || {},
+            }),
+            subscribe: jest.fn(),
+            dispatch: jest.fn()
+        }
+    };
+
+    beforeEach(() => {
+        history = createMemoryHistory();
+    });
+
     it("has map container", () => {
-        const { getByTestId } = render(<Map />);
+        const { getByTestId } = render(
+            <Router history={history}>
+                <Provider store={getStore()}>
+                    <Map />
+                </Provider>
+            </Router>
+        );;
 
         const mapContainer = getByTestId("Map");
         expect(mapContainer).toBeInTheDocument();
@@ -37,7 +73,13 @@ describe("Map", () => {
 
     it("creates mapboxgl.Map instance and pass container", () => {
         let container;
-        const { getByTestId } = render(<Map ref={el => container = el} />);
+        const { getByTestId } = render(
+            <Router history={history}>
+                <Provider store={getStore()}>
+                    <Map ref={el => container = el} />
+                </Provider>
+            </Router>
+        );
         const mapInstance = container.map;
 
         const mapContainer = getByTestId("Map");
@@ -47,7 +89,13 @@ describe("Map", () => {
 
     it("calls remove mapboxgl.Map method if unmount", () => {
         let container;
-        const { unmount } = render(<Map ref={el => container = el} />);
+        const { unmount } = render(
+            <Router history={history}>
+                <Provider store={getStore()}>
+                    <Map ref={el => container = el} />
+                </Provider>
+            </Router>
+        );
         const mapInstance = container.map;
 
         unmount();

@@ -1,22 +1,29 @@
 import { createStore, compose, applyMiddleware } from "redux";
-import { userMiddleware } from "./modules/user";
-import { profileMiddleware } from "./modules/profile";
+import createSagaMiddleware from "redux-saga";
+import { rootSaga as userRootSaga } from "./modules/user";
+import { rootSaga as profileRootSaga } from "./modules/profile";
+import { rootSaga as routeRootSaga } from "./modules/route";
 import rootReducer from "./modules";
+
+const sagaMiddleware = createSagaMiddleware();
 
 const createAppStore = () => {
     const store = createStore(
         rootReducer,
         getPersistedState(),
         compose(
-            applyMiddleware(userMiddleware),
-            applyMiddleware(profileMiddleware),
+            applyMiddleware(sagaMiddleware),
             window.__REDUX_DEVTOOLS_EXTENSION__
               ? window.__REDUX_DEVTOOLS_EXTENSION__()
               : noop => noop
         )
     );
 
-    withPersistState(store);
+    sagaMiddleware.run(userRootSaga);
+    sagaMiddleware.run(profileRootSaga);
+    sagaMiddleware.run(routeRootSaga);
+
+    withPersistedState(store);
 
     return store;
 };
@@ -27,7 +34,7 @@ function getPersistedState() {
         : {}
 }
 
-function withPersistState(store) {
+function withPersistedState(store) {
     store.subscribe(() => localStorage.setItem("loft-taxi", JSON.stringify(store.getState())));
 }
 

@@ -19,7 +19,7 @@ const isLoading = handleActions(
         [saveSuccess]: () => false,
         [saveFailure]: () => false,
     },
-    ""
+    false
 );
 
 const cardHolder = handleActions(
@@ -68,6 +68,8 @@ const getError = handleActions(
 const saveError = handleActions(
     {
         [saveFailure]: (_state, action) => action.payload,
+        [saveRequest]: () => null,
+        [getRequest]: () => null,
     },
     null
 );
@@ -81,6 +83,16 @@ const isSaved = handleActions(
     false
 );
 
+const isCardFilled = handleActions(
+    {
+        [getSuccess]: (_state, { payload: { cardHolder, cardNumber, expiryDate, cvc } }) => !!(cardHolder && cardNumber && expiryDate && cvc),
+        [saveSuccess]: (_state, { payload: { cardHolder, cardNumber, expiryDate, cvc } }) => !!(cardHolder && cardNumber && expiryDate && cvc),
+        [getFailure]: () => false,
+        [saveFailure]: () => false
+    },
+    false
+)
+
 export default combineReducers({
     isLoading,
     cardHolder,
@@ -89,5 +101,6 @@ export default combineReducers({
     cvc,
     getError,
     saveError,
-    isSaved
+    isSaved,
+    isCardFilled
 });
