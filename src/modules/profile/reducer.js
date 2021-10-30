@@ -19,7 +19,7 @@ const isLoading = handleActions(
         [saveSuccess]: () => false,
         [saveFailure]: () => false,
     },
-    ""
+    false
 );
 
 const cardHolder = handleActions(

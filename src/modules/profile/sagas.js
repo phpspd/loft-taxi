@@ -30,7 +30,7 @@ export function* savePaymentSaga(action) {
     }
 };
 
-export default function* paymentSaga() {
+export default function* profileRootSaga() {
     yield takeEvery(getRequest, getPaymentSaga);
     yield takeEvery(saveRequest, savePaymentSaga);
 }

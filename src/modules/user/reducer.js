@@ -5,9 +5,9 @@ import {
     authSuccess,
     authFailure,
     authLogOut,
-    registrationFailure,
     registrationRequest,
-    registrationSuccess
+    registrationSuccess,
+    registrationFailure
 } from "./actions";
 
 const isLoggedIn = handleActions(
@@ -24,10 +24,10 @@ const isLoggedIn = handleActions(
 const token = handleActions(
     {
         [authRequest]: () => null,
-        [authSuccess]: (_state, action) => action.payload || null,
+        [authSuccess]: (_state, action) => action.payload,
         [authLogOut]: () => null,
         [registrationRequest]: () => null,
-        [registrationSuccess]: (_state, action) => action.payload || null
+        [registrationSuccess]: (_state, action) => action.payload
     },
     null
 );

@@ -1,7 +1,7 @@
 import { getFailure, getRequest, getSuccess, saveFailure, saveRequest, saveSuccess } from "./actions";
 import { serverGetCard, serverSaveCard } from "../../api";
-import { recordSaga } from "./recordSaga";
-import paymentSaga, { getPaymentSaga, savePaymentSaga } from "./sagas";
+import { recordSaga } from "../../helpers/recordSaga";
+import profileRootSaga, { getPaymentSaga, savePaymentSaga } from "./sagas";
 
 jest.mock("../../api");
 
@@ -44,7 +44,7 @@ describe("module profile", () => {
         jest.restoreAllMocks();
     });
 
-    describe("paymentSaga", function () {
+    describe("profileRootSaga", function () {
         describe("GET_REQUEST", () => {
             it("gets profile details through api", async () => {
                 mockApiSuccess();
@@ -195,7 +195,7 @@ describe("module profile", () => {
                 mockApiFailure();
 
                 const dispatched = await recordSaga(
-                    paymentSaga,
+                    profileRootSaga,
                     mockUnknownAction
                 );
     
