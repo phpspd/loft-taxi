@@ -2,7 +2,7 @@ import { Box, Button, CardMedia, Container, FormControl, InputLabel, MenuItem, P
 import React from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
+import { styled } from "@material-ui/core/styles";
 import { getIsCardFilled } from "../../modules/profile";
 import { getAddressList, getRouteRequest, clearRoute, getRoutePoints } from "../../modules/route";
 import PropTypes from "prop-types";
@@ -25,118 +25,118 @@ const rates = [
     }
 ];
 
-const ComponentWrapper = styled.section`
-    height: calc(100vh - 73px);
-    position: relative;
-    pointer-events: none;
-`;
+const ComponentWrapper = styled("section")({
+    height: "calc(100vh - 73px)",
+    position: "relative",
+    pointerEvents: "none"
+});
 
-const ComponentContainer = styled(Container)`
-    padding: 24px;
-    position: absolute;
-`;
+const ComponentContainer = styled(Container)({
+    padding: "24px",
+    position: "absolute"
+});
 
-const FormPaper = styled(Paper)`
-    width: 486px;
-    padding: 16px 0;
-    border-radius: 10px;
-    padding-bottom: 34px;
-    pointer-events: all;
-    &.cardNotFilled {
-        padding: 30px;
+const FormPaper = styled(Paper)({
+    width: "486px",
+    padding: "16px 0",
+    borderRadius: "10px",
+    paddingBottom: "34px",
+    pointerEvents: "all",
+    "&.cardNotFilled": {
+        padding: "30px"
     }
-`;
+});
 
-const FormContainer = styled(Container)`
-    padding: 0 20px;
-`;
+const FormContainer = styled(Container)({
+    padding: "0 20px"
+});
 
-const StyledFormControl = styled(FormControl)`
-    position: relative;
-    min-width: 100%;
-    &:first-child {
-        margin-bottom: 8px;
+const StyledFormControl = styled(FormControl)({
+    position: "relative",
+    minWidth: "100%",
+    "&:first-child": {
+        marginBottom: "8px"
     }
-`;
+});
 
-const BottomPaper = styled(Paper)`
-    top: 164px;
-    left: 24px;
-    padding: 32px 46px;
-    position: absolute;
-    max-width: 486px;
-    box-sizing: border-box;
-    border-radius: 10px;
-    pointer-events: all;
-`;
+const BottomPaper = styled(Paper)({
+    top: "164px",
+    left: "24px",
+    padding: "32px 46px",
+    position: "absolute",
+    maxWidth: "486px",
+    boxSizing: "border-box",
+    borderRadius: "10px",
+    pointerEvents: "all"
+});
 
-const RatesContainer = styled.div`
-    display: flex;
-    justify-content: space-between;
-`;
+const RatesContainer = styled("div")({
+    display: "flex",
+    justifyContent: "space-between"
+});
 
-const RatePaper = styled(Paper)`
-    width: 118px;
-    cursor: pointer;
-    height: 167px;
-    opacity: 0.6;
-    padding: 12px;
-    box-sizing: border-box;
-    transition: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-    margin-right: 20px;
-    border-radius: 10px;
-    &:last-child {
-        margin-right: 0;
+const RatePaper = styled(Paper)({
+    width: "118px",
+    cursor: "pointer",
+    height: "167px",
+    opacity: "0.6",
+    padding: "12px",
+    boxSizing: "border-box",
+    transition: "250ms cubic-bezier(0.4, 0, 0.2, 1)",
+    marginRight: "20px",
+    borderRadius: "10px",
+    "&:last-child": {
+        marginRight: 0
+    },
+    "&.active": {
+        opacity: 1,
+        boxShadow: "0px 3px 5px -1px rgb(0 0 0 / 20%), 0px 5px 8px 0px rgb(0 0 0 / 14%), 0px 1px 14px 0px rgb(0 0 0 / 12%)"
     }
-    &.active {
-        opacity: 1;
-        box-shadow: 0px 3px 5px -1px rgb(0 0 0 / 20%), 0px 5px 8px 0px rgb(0 0 0 / 14%), 0px 1px 14px 0px rgb(0 0 0 / 12%);
-    }
-`;
+});
 
-const RatePriceCaption = styled(Typography)`
-    color: #828282;
-    font-size: 11px;
-    line-height: 11px;
-`;
+const RatePriceCaption = styled(Typography)({
+    color: "#828282",
+    fontSize: "11px",
+    lineHeight: "11px"
+});
 
-const RatePriceValue = styled(Typography)`
-    line-height: 1;
-`;
+const RatePriceValue = styled(Typography)({
+    lineHeight: 1
+});
 
-const RateCardMedia = styled(CardMedia)`
-    width: 95px;
-    height: 72px;
-    margin-top: 12px;
-`;
+const RateCardMedia = styled(CardMedia)({
+    width: "95px",
+    height: "72px",
+    marginTop: "12px"
+});
 
-const FormButton = styled(Button)`
-    margin-top: 30px;
-    padding-left: 24px;
-    padding-right: 24px;
-    font-size: 1.3rem;
-    font-weight: 400;
-    border-radius: 40px;
-    letter-spacing: 0px;
-`;
+const FormButton = styled(Button)({
+    marginTop: "30px",
+    paddingLeft: "24px",
+    paddingRight: "24px",
+    fontSize: "1.3rem",
+    fontWeight: "400",
+    borderRadius: "40px",
+    letterSpacing: "0px"
+});
 
-const NotifyContainer = styled(Container)`
-    padding: 0 20px;
-`;
+const NotifyContainer = styled(Container)({
+    padding: "0 20px"
+});
 
-const StyledBox = styled(Box)`
-    padding: 0 24px;
-    text-align: left;
-`;
+const StyledBox = styled(Box)({
+    padding: "0 24px",
+    textAlign: "left"
+});
 
-const NotifyHeader = styled(Typography)`
-    font-weight: 700;
-    margin-bottom: 16px;
-`;
+const NotifyHeader = styled(Typography)({
+    fontWeight: 700,
+    marginBottom: "16px"
+});
 
-const NotifyText = styled(Typography)`
+const NotifyText = styled(Typography)({
 
-`; //@media?
+}); //@media?
 
 function ArrowIcon(props) {
     return (
