@@ -1,5 +1,6 @@
-import { Button, Paper, TextField, Typography } from "@material-ui/core";
 import React from "react";
+import { Button, Paper, TextField, Typography } from "@material-ui/core";
+import { reduxForm, Field } from "redux-form";
 import FlexRow, { FlexRowSpacer } from "../form/FlexRow/FlexRow";
 
 import { ReactComponent as ChipIcon } from "./resources/ChipIcon.svg";
@@ -11,14 +12,94 @@ import { clearIsSaved, getCardHolder, getCardNumber, getCvc, getExpiryDate, getI
 import { getToken } from "../../modules/user";
 import { Link } from "react-router-dom";
 
-export class Profile extends React.Component {
-    state = {
-        cardHolder: this.props.cardHolder || "",
-        cardNumber: this.props.cardNumber || "",
-        expiryDate: this.props.expiryDate || "",
-        cvc: this.props.cvc || ""
+const Input = ({
+    label,
+    input,
+    meta: { touched, invalid, error },
+    inputProps,
+    ...custom
+}) => {
+    return (
+        <TextField
+            label={label}
+            placeholder={label}
+            error={touched && invalid}
+            helperText={touched && error}
+            inputProps={{...inputProps, "data-testid": input.name}}
+            {...input}
+            {...custom}
+        ></TextField>
+    );
+};
+
+const normalizeCardHolder = value => {
+    return value.toUpperCase();
+};
+
+const normalizeCardNumber = value => {
+    if (!value) {
+        return value;
+    }
+    const onlyNums = value.replace(/[^\d]/g, '');
+    let result = "";
+    for (let group = 0; group < 4; ++group) {
+        result += onlyNums.substr(group * 4, 4);
+        if (onlyNums.length > group * 4) {
+            result += " ";
+        }
+    }
+    return result.trim();
+};
+
+const normalizeExpiryDate = value => {
+    if (!value) {
+        return value;
     }
 
+    const onlyNums = value.replace(/[^\d]/g, '');
+    if (onlyNums.length >= 2) {
+        return onlyNums.substr(0, 2) + "/" + onlyNums.substr(2, 2);
+    }
+    return onlyNums.substr(0, 2);
+};
+
+const normalizeCvc = value => {
+    if (!value) {
+        return value;
+    }
+
+    const onlyNums = value.replace(/[^\d]/g, '');
+    
+    return onlyNums.substr(0, 3);
+};
+
+const profileFormValidator = values => {
+    const errors = {};
+
+    if (!(values.cardHolder || "").trim()) {
+        errors.cardHolder = "required";
+    }
+
+    if (!values.cardNumber) {
+        errors.cardNumber = "required";
+    } else if (values.cardNumber.length < 19) {
+        errors.cardNumber = "should be 16 digitals length";
+    }
+
+    if (!values.expiryDate) {
+        errors.expiryDate = "required";
+    } else if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(values.expiryDate)) {
+        errors.expiryDate = "invalid date format";
+    }
+
+    if (!values.cvc) {
+        errors.cvc = "required";
+    }
+
+    return errors;
+};
+
+export class Profile extends React.Component {
     componentDidMount() {
         const { isSaved } = this.props;
         if (isSaved) {
@@ -26,66 +107,14 @@ export class Profile extends React.Component {
         }
     }
 
-    onCardHolderChange = (e) => {
-        this.setState({
-            cardHolder: e.target.value.toUpperCase()
-        });
-    }
-
-    onCardNumberChange = (e) => {
-        const value = e.target.value;
-
-        if (/[^\d ]/.test(value)) {
-            return;
-        }
-
-        const formattedValue = value.split("").reduce(
-            (acc, sym) => 
-                acc + (
-                    sym === " "
-                    ? ""
-                    : (
-                        acc.length % 5 === 4
-                        ? " "
-                        : ""
-                    ) + sym
-                ), ""
-        )
-        
-        this.setState({
-            cardNumber: formattedValue.substr(0, 19)
-        });
-    }
-
-    onExpiryDateChange = (e) => {
-        let value = e.target.value;
-        
-        value = value.replace(/\D/g, "");
-        
-        const formattedValue = value.substr(0, 2) + (value.length > 2 ? "/" : "") + value.substr(2, 2);
-
-        this.setState({
-            expiryDate: formattedValue.substr(0, 5)
-        });
-    }
-
-    onCvcChange = (e) => {
-        const value = e.target.value.replace(/\D/g, "").substr(0, 3);
-
-        this.setState({
-            cvc: value
-        });
-    }
-
-    submit = (e) => {
-        e.preventDefault();
+    onSubmit = ({ cardHolder, cardNumber, expiryDate, cvc }) => {
         try {
             this.props.save(
-                this.state.cardHolder,
-                this.state.cardNumber,
-                convertExpiryDateToDate(this.state.expiryDate),
-                this.state.cvc,
-                this.props.token,
+                cardHolder,
+                cardNumber,
+                convertExpiryDateToDate(expiryDate),
+                cvc,
+                this.props.token
             );
         } catch(error) {
             this.props.saveFailure(error);
@@ -114,57 +143,55 @@ export class Profile extends React.Component {
         return (
             <>
                 <Typography variant="body1" align="center">Введите платежные данные</Typography>
-                <form onSubmit={this.submit} data-testid="Profile-form">
+                <form onSubmit={this.props.handleSubmit(this.onSubmit)} data-testid="Profile-form">
                     <div className="form-container">
                         <div className="left">
-                                <TextField
+                                <Field
                                     className="margin-bottom full-width"
                                     label="Имя владельца"
                                     name="cardHolder"
                                     fullWidth
-                                    required
-                                    onChange={this.onCardHolderChange}
-                                    value={this.state.cardHolder}
+                                    //required
                                     inputProps={{"data-testid": "cardHolder"}}
-                                    error={!!this.props.saveError}
-                                ></TextField>
-                                <TextField
+                                    component={Input}
+                                    normalize={normalizeCardHolder}
+                                />
+                                <Field
                                     className="margin-bottom full-width"
                                     label="Номер карты"
                                     name="cardNumber"
                                     fullWidth
-                                    required
+                                    //required
                                     maxLength="19"
                                     onChange={this.onCardNumberChange}
-                                    value={this.state.cardNumber}
                                     inputProps={{"data-testid": "cardNumber"}}
-                                    error={!!this.props.saveError}
-                                ></TextField>
+                                    component={Input}
+                                    normalize={normalizeCardNumber}
+                                />
                                 <FlexRow className="full-width">
-                                    <TextField
+                                    <Field
                                         className="margin-right"
                                         label="MM/YY"
                                         name="expiryDate"
                                         fullWidth
-                                        required
+                                        //required
                                         onChange={this.onExpiryDateChange}
-                                        value={this.state.expiryDate}
                                         inputProps={{"data-testid": "expiryDate"}}
-                                        error={!!this.props.saveError}
-                                    ></TextField>
+                                        component={Input}
+                                        normalize={normalizeExpiryDate}
+                                    />
                                     <FlexRowSpacer />
-                                    <TextField
-                                        className="TextField"
+                                    <Field
                                         label="CVC"
                                         name="cvc"
                                         fullWidth
-                                        required
+                                        //required
                                         maxLength="3"
                                         onChange={this.onCvcChange}
-                                        value={this.state.cvc}
                                         inputProps={{"data-testid": "cvc"}}
-                                        error={!!this.props.saveError}
-                                    ></TextField>
+                                        component={Input}
+                                        normalize={normalizeCvc}
+                                    />
                                 </FlexRow>
                         </div>
                         <div className="right">
@@ -174,7 +201,12 @@ export class Profile extends React.Component {
                                     <Typography variant="body1">{this.expiryDate}</Typography>
                                 </div>
                                 <div>
-                                    <Typography className="card-number" variant="body1" data-testid="placeCardNumber">{this.state.cardNumber || "0000 0000 0000 0000"}</Typography>
+                                    <Field
+                                        name="cardNumber"
+                                        component={({ input: { value }}) => (
+                                            <Typography className="card-number" variant="body1" data-testid="placeCardNumber">{value || "0000 0000 0000 0000"}</Typography>
+                                        )}
+                                    />
                                 </div>
                                 <div className="card-bottom">
                                     <ChipIcon />
@@ -209,10 +241,12 @@ export class Profile extends React.Component {
 }
 
 const mapStateToProps = state => ({
-    cardHolder: getCardHolder(state),
-    cardNumber: getCardNumber(state),
-    expiryDate: convertDateToExpiryDate(getExpiryDate(state)),
-    cvc: getCvc(state),
+    initialValues: {
+        cardHolder: getCardHolder(state),
+        cardNumber: getCardNumber(state),
+        expiryDate: convertDateToExpiryDate(getExpiryDate(state)),
+        cvc: getCvc(state),
+    },
     token: getToken(state),
     isSaved: getIsSaved(state),
     saveError: getSaveError(state)
@@ -238,7 +272,12 @@ const mapDispatchToProps = {
     clearIsSaved
 };
 
+const WrappedProfile = reduxForm({
+    form: "profileForm",
+    validate: profileFormValidator
+})(Profile);
+
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(Profile);
+)(WrappedProfile);

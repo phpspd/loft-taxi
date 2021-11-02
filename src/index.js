@@ -13,10 +13,19 @@ import createStore from "./store";
 
 const store = createStore();
 
+const fixTheme = theme => {
+    try {
+        theme.overrides.MuiFormHelperText.root.bottom = "-1.4em";
+        theme.overrides.MuiButton.containedPrimary.backgroundColor = "#fdbf5a";
+        theme.palette.primary.main = "#fdbf5a";
+    } catch(err) {}
+    return theme;
+}
+
 ReactDOM.render(
     //<React.StrictMode>
         <Provider store={store}>
-            <MuiThemeProvider theme={theme}>
+            <MuiThemeProvider theme={fixTheme(theme)}>
                 <BrowserRouter>
                     <App />
                 </BrowserRouter>

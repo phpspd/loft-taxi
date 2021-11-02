@@ -200,7 +200,7 @@ class TripSwitcher extends React.Component {
                             <StyledBox>
                                 <NotifyHeader variant="h4" align="left">Платежные данные не заполнены</NotifyHeader>
                                 <NotifyText variant="body1" align="left">Пожалуйста, перейдите в профиль и заполните.</NotifyText>
-                                <FormButton to="/profile" component={Link} variant="contained" color="primary" fullWidth>Перейти</FormButton>
+                                <FormButton to="/profile" component={Link} variant="contained" color="primary">Перейти</FormButton>
                             </StyledBox>
                         </NotifyContainer>
                     </FormPaper>
