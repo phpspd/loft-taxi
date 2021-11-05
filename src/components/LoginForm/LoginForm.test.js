@@ -3,22 +3,21 @@ import LoginForm from "./LoginForm";
 import { render, fireEvent } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { authRequest } from "../../modules/user";
+import { dispatched, createStoreMock } from "../../helpers/createStoreMock";
 
-jest.mock("./RegistrationLink/RegistrationLink", () => () => "RegistrationLink");
+jest.mock("./components", () => ({
+    RegistrationLink: () => "RegistrationLinkComponent"
+}));
 
 describe("LoginForm", () => {
     let store;
 
     beforeEach(() => {
-        store = {
-            getState: () => ({ user: { isLoggedIn: true } }),
-            subscribe: () => { },
-            dispatch: jest.fn()
-        }
+        store = createStoreMock({ user: { isLoggedIn: true } });
     });
 
     it("renders correct", () => {
-        const { getByTestId } = render(
+        const { getByTestId, getByText } = render(
             <Provider store={store}>
                 <LoginForm isLoggedIn={false} />
             </Provider>
@@ -29,6 +28,9 @@ describe("LoginForm", () => {
 
         const submitButton = getByTestId("LoginForm-SubmitButton");
         expect(submitButton).toBeInTheDocument();
+
+        const regLink = getByText("RegistrationLinkComponent");
+        expect(regLink).toBeInTheDocument();
     });
 
     it("calls logIn on submit if email and password set", () => {
@@ -39,10 +41,22 @@ describe("LoginForm", () => {
         );
 
         const form = getByTestId("LoginForm-form");
+        const emailInput = getByTestId("email");
+        const passwordInput = getByTestId("password");
 
-        fireEvent.submit(form, { target: { email: { value: "test@test.com" }, password: { value: "123123" } } });
+        fireEvent.change(emailInput, { target: { value: "test@test.com" } });
+        fireEvent.change(passwordInput, { target: { value: "123123" } });
 
-        expect(store.dispatch).toBeCalledWith({ type: authRequest.toString(), payload: { email: "test@test.com", password: "123123" } });
+        fireEvent.submit(form);
+
+        expect(dispatched.length).toEqual(1);
+        expect(dispatched[0]).toEqual({
+            type: authRequest.toString(),
+            payload: {
+                email: "test@test.com",
+                password: "123123"
+            }
+        });
     });
 
     it("not calls logIn if email not set", () => {
@@ -53,9 +67,14 @@ describe("LoginForm", () => {
         );
 
         const form = getByTestId("LoginForm-form");
+        const emailInput = getByTestId("email");
+        const passwordInput = getByTestId("password");
 
-        fireEvent.submit(form, { target: { email: { value: "" }, password: { value: "123123" } } });
-        expect(store.dispatch).not.toBeCalled();
+        fireEvent.change(emailInput, { target: { value: "" } });
+        fireEvent.change(passwordInput, { target: { value: "123123" } });
+
+        fireEvent.submit(form);
+        expect(dispatched.length).toEqual(0);
     });
 
     it("not calls logIn if password not set", () => {
@@ -66,8 +85,13 @@ describe("LoginForm", () => {
         );
 
         const form = getByTestId("LoginForm-form");
+        const emailInput = getByTestId("email");
+        const passwordInput = getByTestId("password");
 
-        fireEvent.submit(form, { target: { email: { value: "test@test.com" }, password: { value: "" } } });
-        expect(store.dispatch).not.toBeCalled();
+        fireEvent.change(emailInput, { target: { value: "test@test.com" } });
+        fireEvent.change(passwordInput, { target: { value: "" } });
+
+        fireEvent.submit(form);
+        expect(dispatched.length).toEqual(0);
     });
 });

@@ -17,6 +17,9 @@ const fixTheme = theme => {
     try {
         theme.overrides.MuiFormHelperText.root.bottom = "-1.4em";
         theme.overrides.MuiButton.containedPrimary.backgroundColor = "#fdbf5a";
+        theme.overrides.MuiButton.containedPrimary["&:hover"] = {
+            backgroundColor: "#ffa842"
+        };
         theme.palette.primary.main = "#fdbf5a";
     } catch(err) {}
     return theme;

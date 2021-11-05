@@ -1,7 +1,9 @@
 import { TextField } from "@material-ui/core";
+import { Field } from "redux-form";
 
-export const Input = ({
+const InternalInput = ({
     label,
+    placeholder,
     input,
     meta: { touched, invalid, error },
     inputProps,
@@ -10,7 +12,7 @@ export const Input = ({
     return (
         <TextField
             label={label}
-            placeholder={label}
+            placeholder={placeholder || label}
             error={touched && invalid}
             helperText={touched && error}
             inputProps={{...inputProps, "data-testid": input.name}}
@@ -19,3 +21,12 @@ export const Input = ({
         ></TextField>
     );
 };
+
+export const Input = (props) => {
+    return (
+        <Field
+            {...props}
+            component={InternalInput}
+        />
+    )
+}

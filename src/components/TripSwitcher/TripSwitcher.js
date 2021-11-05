@@ -1,10 +1,11 @@
-import { Box, Button, CardMedia, Container, FormControl, InputLabel, MenuItem, Paper, Select, SvgIcon, Typography } from "@material-ui/core";
+import { Box, CardMedia, Container, FormControl, InputLabel, MenuItem, Paper, Select, SvgIcon, Typography } from "@material-ui/core";
 import React from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import { styled, withStyles } from "@material-ui/styles";
 import { getIsCardFilled } from "../../modules/profile";
 import { getAddressList, getRouteRequest, clearRoute, getRoutePoints } from "../../modules/route";
+import { Button } from "../form";
 import PropTypes from "prop-types";
 
 const rates = [
@@ -127,14 +128,7 @@ const RateCardMedia = withStyles({
 
 const FormButton = withStyles({
     root: {
-        width: "100%",
-        marginTop: "30px",
-        paddingLeft: "24px",
-        paddingRight: "24px",
-        fontSize: "1.3rem",
-        fontWeight: "400",
-        borderRadius: "40px",
-        letterSpacing: "0px"
+        marginTop: "30px"
     }
 })(Button);
 
@@ -220,7 +214,7 @@ class TripSwitcher extends React.Component {
                             <StyledBox>
                                 <NotifyHeader variant="h4" align="left">Заказ размещен</NotifyHeader>
                                 <Typography variant="body1" align="left">Ваше такси уже едет к вам. Прибудет приблизительно через 10 минут.</Typography>
-                                <FormButton variant="contained" onClick={this.clearRoute} color="primary" fullWidth>Сделать новый заказ</FormButton>
+                                <FormButton variant="contained" onClick={this.clearRoute} color="primary" fullWidth data-testid="TripSwitcher-clear-btn">Сделать новый заказ</FormButton>
                             </StyledBox>
                         </NotifyContainer>
                     </FormPaper>
@@ -235,12 +229,13 @@ class TripSwitcher extends React.Component {
                             <StyledFormControl>
                                 <InputLabel id="select-from-label">Откуда</InputLabel>
                                 <Select
-                                labelId="select-from-label"
-                                id="select-from"
-                                autoWidth
-                                IconComponent={ArrowIcon}
-                                value={this.state.from || ""}
-                                onChange={this.changeFrom}
+                                    labelId="select-from-label"
+                                    id="select-from"
+                                    autoWidth
+                                    IconComponent={ArrowIcon}
+                                    value={this.state.from || ""}
+                                    onChange={this.changeFrom}
+                                    data-testid="select-from"
                                 >
                                 {
                                     this.props.addressList
@@ -254,12 +249,13 @@ class TripSwitcher extends React.Component {
                             <StyledFormControl>
                                 <InputLabel id="select-to-label">Куда</InputLabel>
                                 <Select
-                                labelId="select-to-label"
-                                id="select-to"
-                                autoWidth
-                                IconComponent={ArrowIcon}
-                                value={this.state.to || ""}
-                                onChange={this.changeTo}
+                                    labelId="select-to-label"
+                                    id="select-to"
+                                    autoWidth
+                                    IconComponent={ArrowIcon}
+                                    value={this.state.to || ""}
+                                    onChange={this.changeTo}
+                                    data-testid="select-to"
                                 >
                                 {
                                     this.props.addressList
@@ -275,7 +271,13 @@ class TripSwitcher extends React.Component {
                     <BottomPaper elevation={5}>
                         <RatesContainer>
                             {rates.map((rate, index) => (
-                                <RatePaper className={this.state.rateIndex === index ? "active" : undefined} key={index} elevation={3} onClick={() => this.switchRate(index)}>
+                                <RatePaper
+                                    className={this.state.rateIndex === index ? "active" : undefined}
+                                    key={index}
+                                    elevation={3}
+                                    onClick={() => this.switchRate(index)}
+                                    data-testid={`rate-${index}`}
+                                >
                                     <Typography variant="body1">{rate.caption}</Typography>
                                     <RatePriceCaption variant="caption">Стоимость</RatePriceCaption>
                                     <RatePriceValue variant="h6">{rate.price}</RatePriceValue>
@@ -283,7 +285,7 @@ class TripSwitcher extends React.Component {
                                 </RatePaper>
                             ))}
                         </RatesContainer>
-                        <FormButton variant="contained" onClick={this.order} color="primary" fullWidth>Заказать</FormButton>
+                        <FormButton variant="contained" onClick={this.order} color="primary" fullWidth data-testid="TripSwitcher-submit">Заказать</FormButton>
                     </BottomPaper>
                 </ComponentContainer>
             </ComponentWrapper>

@@ -4,27 +4,13 @@ import { Provider } from 'react-redux';
 import { createMemoryHistory } from "history";
 import { Router } from 'react-router';
 import { render } from '@testing-library/react';
+import { createStoreMock } from "../../helpers/createStoreMock";
 
 jest.mock("../AsideLogo/AsideLogo", () => () => "AsideLogo");
 jest.mock("../LoginForm/LoginForm", () => () => "Login Form");
 
 describe("Login", () => {
     let history;
-    const getStore = (state) => {
-        state = state || {
-            user: {},
-            profile: {}
-        };
-        
-        return {
-            getState: () => ({
-                user: state.user || {},
-                profile: state.profile || {}
-            }),
-            subscribe: jest.fn(),
-            dispatch: jest.fn()
-        }
-    };
 
     beforeEach(() => {
         history = createMemoryHistory();
@@ -35,7 +21,7 @@ describe("Login", () => {
 
         render(
             <Router history={history}>
-                <Provider store={getStore({
+                <Provider store={createStoreMock({
                     user: {
                         isLoggedIn: true
                     }
@@ -49,7 +35,7 @@ describe("Login", () => {
     });
 
     it("renders LoginForm if not logged in", () => {
-        const store = getStore({
+        const store = createStoreMock({
             user: {
                 isLoggedIn: false
             }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { LoginLink } from "./LoginLink";
+import { LoginLink } from ".";
 import { render, fireEvent } from "@testing-library/react";
 import { Router } from 'react-router';
 import { createMemoryHistory } from 'history';

@@ -1,7 +1,7 @@
 import React from "react";
-import { Button, Paper, TextField, Typography } from "@material-ui/core";
+import { Paper, Typography } from "@material-ui/core";
 import { reduxForm, Field } from "redux-form";
-import FlexRow, { FlexRowSpacer } from "../form/FlexRow/FlexRow";
+import { Row, RowSpacer, Input, Button } from "../form";
 
 import { ReactComponent as ChipIcon } from "./resources/ChipIcon.svg";
 import { ReactComponent as CardLogo } from "./resources/CardLogo.svg";
@@ -11,26 +11,6 @@ import { connect } from "react-redux";
 import { clearIsSaved, getCardHolder, getCardNumber, getCvc, getExpiryDate, getIsSaved, saveRequest, saveFailure, getSaveError } from "../../modules/profile";
 import { getToken } from "../../modules/user";
 import { Link } from "react-router-dom";
-
-const Input = ({
-    label,
-    input,
-    meta: { touched, invalid, error },
-    inputProps,
-    ...custom
-}) => {
-    return (
-        <TextField
-            label={label}
-            placeholder={label}
-            error={touched && invalid}
-            helperText={touched && error}
-            inputProps={{...inputProps, "data-testid": input.name}}
-            {...input}
-            {...custom}
-        ></TextField>
-    );
-};
 
 const normalizeCardHolder = value => {
     return value.toUpperCase();
@@ -99,7 +79,7 @@ const profileFormValidator = values => {
     return errors;
 };
 
-export class Profile extends React.Component {
+class Profile extends React.Component {
     componentDidMount() {
         const { isSaved } = this.props;
         if (isSaved) {
@@ -146,53 +126,45 @@ export class Profile extends React.Component {
                 <form onSubmit={this.props.handleSubmit(this.onSubmit)} data-testid="Profile-form">
                     <div className="form-container">
                         <div className="left">
-                                <Field
+                                <Input
                                     className="margin-bottom full-width"
                                     label="Имя владельца"
                                     name="cardHolder"
                                     fullWidth
-                                    //required
-                                    inputProps={{"data-testid": "cardHolder"}}
-                                    component={Input}
+                                    required
                                     normalize={normalizeCardHolder}
                                 />
-                                <Field
+                                <Input
                                     className="margin-bottom full-width"
                                     label="Номер карты"
                                     name="cardNumber"
                                     fullWidth
-                                    //required
+                                    required
                                     maxLength="19"
                                     onChange={this.onCardNumberChange}
-                                    inputProps={{"data-testid": "cardNumber"}}
-                                    component={Input}
                                     normalize={normalizeCardNumber}
                                 />
-                                <FlexRow className="full-width">
-                                    <Field
+                                <Row className="full-width">
+                                    <Input
                                         className="margin-right"
                                         label="MM/YY"
                                         name="expiryDate"
                                         fullWidth
-                                        //required
+                                        required
                                         onChange={this.onExpiryDateChange}
-                                        inputProps={{"data-testid": "expiryDate"}}
-                                        component={Input}
                                         normalize={normalizeExpiryDate}
                                     />
-                                    <FlexRowSpacer />
-                                    <Field
+                                    <RowSpacer />
+                                    <Input
                                         label="CVC"
                                         name="cvc"
                                         fullWidth
-                                        //required
+                                        required
                                         maxLength="3"
                                         onChange={this.onCvcChange}
-                                        inputProps={{"data-testid": "cvc"}}
-                                        component={Input}
                                         normalize={normalizeCvc}
                                     />
-                                </FlexRow>
+                                </Row>
                         </div>
                         <div className="right">
                             <Paper className="card" elevation={5}>

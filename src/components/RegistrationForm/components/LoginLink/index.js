@@ -2,7 +2,7 @@ import React from "react";
 
 import { Typography } from "@material-ui/core";
 
-import "./LoginLink.css";
+import "./index.css";
 import { Link } from "react-router-dom";
 
 export const LoginLink = props => {

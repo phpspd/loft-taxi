@@ -1,42 +1,41 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import RegistrationLink from "./RegistrationLink/RegistrationLink";
-import SubmitButton from "../SubmitButton/SubmitButton";
+import { RegistrationLink } from "./components";
+import { Button } from "../form";
 
 import "./LoginForm.css";
-import { styled, Container, Paper, TextField, Typography } from "@material-ui/core";
+import { withStyles, Container, Paper, Typography } from "@material-ui/core";
+import { Input } from "../form";
 
 import { authRequest, getLoginError } from "../../modules/user";
 import { connect } from "react-redux";
+import { reduxForm } from "redux-form";
+import formValidator from "./utils/validator";
 
-const LoginFormPaper = styled(Paper)({
-    width: "520px",
-    padding: "48px 0",
-    borderRadius: "20px"
-});
+const LoginFormPaper = withStyles({
+    root: {
+        width: "520px",
+        padding: "48px 0",
+        borderRadius: "20px"
+    }
+})(Paper);
 
-const LoginFormContainer = styled(Container)({
-    display: "flex",
-    padding: "0 102px 0 98px",
-    alignItems: "center",
-    flexDirection: "column"
-});
+const LoginFormContainer = withStyles({
+    root: {
+        display: "flex",
+        padding: "0 102px 0 98px",
+        alignItems: "center",
+        flexDirection: "column"
+    }
+})(Container);
 
 export class LoginForm extends React.Component {
     static propTypes = {
         logIn: PropTypes.func.isRequired
     }
 
-    authenticate = event => {
-        event.preventDefault();
-
-        const email = event.target.email.value;
-        const password = event.target.password.value;
-        if (!email || !password) {
-            return ;
-        }
-
+    authenticate = ({ email, password }) => {
         this.props.logIn(email, password);
     }
 
@@ -45,8 +44,8 @@ export class LoginForm extends React.Component {
             <LoginFormPaper className="LoginForm" elevation={5}>
                 <LoginFormContainer maxWidth="lg">
                     <Typography variant="h4">Войти</Typography>
-                    <form onSubmit={this.authenticate} data-testid="LoginForm-form">
-                        <TextField
+                    <form onSubmit={this.props.handleSubmit(this.authenticate)} data-testid="LoginForm-form">
+                        <Input
                             margin="normal"
                             required
                             fullWidth
@@ -54,10 +53,8 @@ export class LoginForm extends React.Component {
                             label="Имя пользователя"
                             name="email"
                             placeholder="email@example.com"
-                            data-testid="TextField-email"
-                            error={this.props.hasError}
                         />
-                        <TextField
+                        <Input
                             margin="normal"
                             required
                             fullWidth
@@ -65,10 +62,8 @@ export class LoginForm extends React.Component {
                             label="Пароль"
                             name="password"
                             placeholder="*********"
-                            data-testid="TextField-password"
-                            error={this.props.hasError}
                         />
-                        <SubmitButton data-testid="LoginForm-SubmitButton">Войти</SubmitButton>
+                        <Button style={{marginTop: "80px"}} type="submit" data-testid="LoginForm-SubmitButton">Войти</Button>
                     </form>
                     <RegistrationLink />
                 </LoginFormContainer>
@@ -85,7 +80,12 @@ const mapDispatchToProps = {
     logIn: (email, password) => authRequest({ email, password })
 };
 
+const WrappedLoginForm = reduxForm({
+    form: "loginForm",
+    validate: formValidator
+})(LoginForm);
+
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(LoginForm);
+)(WrappedLoginForm);
