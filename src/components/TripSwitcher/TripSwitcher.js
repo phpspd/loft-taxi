@@ -212,7 +212,6 @@ class TripSwitcher extends React.Component {
                                         label="Откуда"
                                         autoWidth
                                         value={this.props.from || ""}
-                                        inputProps={{"data-testid": "select-from"}}
                                     >
                                     {
                                         this.props.addressList
@@ -230,7 +229,6 @@ class TripSwitcher extends React.Component {
                                         label="Куда"
                                         autoWidth
                                         value={this.props.to || ""}
-                                        inputProps={{"data-testid": "select-to"}}
                                     >
                                     {
                                         this.props.addressList

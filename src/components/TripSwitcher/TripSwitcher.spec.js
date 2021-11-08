@@ -1,14 +1,14 @@
 import React from 'react';
 import TripSwitcher from './TripSwitcher';
-import { render, fireEvent, act, rerender } from "@testing-library/react";
+import { render, fireEvent, act } from "@testing-library/react";
 import { Router } from "react-router";
 import { createMemoryHistory } from "history";
 import { Provider } from 'react-redux';
 import { createStoreMock, dispatched } from "../../helpers/createStoreMock";
 import { clearRoute, getRouteRequest } from '../../modules/route';
 
-jest.mock("@material-ui/core/Select", () => ({ children, id, "data-testid": dataTestId, onChange }) => (
-    <select id={id} data-testid={dataTestId} onChange={onChange}>
+jest.mock("@material-ui/core/Select", () => ({ children, id, onChange }) => (
+    <select id={id} data-testid={id} onChange={onChange}>
         {children.map(({ props }, index) => (
             <option key={index} {...props}>{props.value}</option>
         ))}
