@@ -1,12 +1,13 @@
-import { Box, CardMedia, Container, FormControl, InputLabel, MenuItem, Paper, Select, SvgIcon, Typography } from "@material-ui/core";
+import { Box, CardMedia, Container, FormControl, MenuItem, Paper, Typography } from "@material-ui/core";
 import React from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import { styled, withStyles } from "@material-ui/styles";
 import { getIsCardFilled } from "../../modules/profile";
 import { getAddressList, getRouteRequest, clearRoute, getRoutePoints } from "../../modules/route";
-import { Button } from "../form";
+import { Button, Select } from "../form";
 import PropTypes from "prop-types";
+import { reduxForm, getFormValues } from "redux-form";
 
 const rates = [
     {
@@ -44,7 +45,7 @@ const FormPaper = withStyles({
         width: "486px",
         padding: "16px 0",
         borderRadius: "10px",
-        paddingBottom: "34px",
+        paddingBottom: "38px",
         pointerEvents: "all"
     }
 })(Paper);
@@ -60,14 +61,14 @@ const StyledFormControl = withStyles({
         position: "relative",
         minWidth: "100%",
         "&:first-child": {
-            marginBottom: "8px"
+            marginBottom: "14px"
         }
     }
 })(FormControl);
 
 const BottomPaper = withStyles({
     root: {
-        top: "164px",
+        top: "172px",
         left: "24px",
         padding: "32px 46px",
         position: "absolute",
@@ -152,14 +153,6 @@ const NotifyHeader = withStyles({
     }
 })(Typography);
 
-function ArrowIcon(props) {
-    return (
-        <SvgIcon {...props}>
-            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"></path>
-        </SvgIcon>
-    )
-}
-
 class TripSwitcher extends React.Component {
     static propTypes = {
         isCardFilled: PropTypes.bool.isRequired,
@@ -172,36 +165,21 @@ class TripSwitcher extends React.Component {
         rateIndex: 0
     };
 
-    switchRate = (index) => {
+    switchRate = index => {
         this.setState({
             rateIndex: index
         });
     }
 
-    changeFrom = ({ target: { value } }) => {
-        this.setState({
-            from: value
-        });
-    }
-
-    changeTo = ({ target: { value } }) => {
-        this.setState({
-            to: value
-        });
-    }
-
-    order = () => {
-        const { from, to } = this.state;
-        if (this.state.from && this.state.to) {
-            this.props.getRouteRequest({ from, to });
-        }
+    order = ({ from, to }) => {
+        this.props.getRouteRequest({ from, to });
     }
 
     clearRoute = () => {
         this.props.clearRoute();
+        this.props.reset();
         this.setState({
-            from: "",
-            to: ""
+            rateIndex: 0
         });
     }
 
@@ -224,69 +202,67 @@ class TripSwitcher extends React.Component {
         if (this.props.isCardFilled) {
             return <ComponentWrapper>
                 <ComponentContainer>
-                    <FormPaper elevation={1}>
-                        <FormContainer>
-                            <StyledFormControl>
-                                <InputLabel id="select-from-label">Откуда</InputLabel>
-                                <Select
-                                    labelId="select-from-label"
-                                    id="select-from"
-                                    autoWidth
-                                    IconComponent={ArrowIcon}
-                                    value={this.state.from || ""}
-                                    onChange={this.changeFrom}
-                                    data-testid="select-from"
-                                >
-                                {
-                                    this.props.addressList
-                                        .filter(val => val !== this.state.to)
-                                        .map((val) => (
-                                            <MenuItem key={val} value={val}>{val}</MenuItem>
-                                        ))
-                                }
-                                </Select>
-                            </StyledFormControl>
-                            <StyledFormControl>
-                                <InputLabel id="select-to-label">Куда</InputLabel>
-                                <Select
-                                    labelId="select-to-label"
-                                    id="select-to"
-                                    autoWidth
-                                    IconComponent={ArrowIcon}
-                                    value={this.state.to || ""}
-                                    onChange={this.changeTo}
-                                    data-testid="select-to"
-                                >
-                                {
-                                    this.props.addressList
-                                        .filter(val => val !== this.state.from)
-                                        .map((val) => (
-                                            <MenuItem key={val} value={val}>{val}</MenuItem>
-                                        ))
-                                }
-                                </Select>
-                            </StyledFormControl>
-                        </FormContainer>
-                    </FormPaper>
-                    <BottomPaper elevation={5}>
-                        <RatesContainer>
-                            {rates.map((rate, index) => (
-                                <RatePaper
-                                    className={this.state.rateIndex === index ? "active" : undefined}
-                                    key={index}
-                                    elevation={3}
-                                    onClick={() => this.switchRate(index)}
-                                    data-testid={`rate-${index}`}
-                                >
-                                    <Typography variant="body1">{rate.caption}</Typography>
-                                    <RatePriceCaption variant="caption">Стоимость</RatePriceCaption>
-                                    <RatePriceValue variant="h6">{rate.price}</RatePriceValue>
-                                    <RateCardMedia image={`/static/media/${rate.img}`} />
-                                </RatePaper>
-                            ))}
-                        </RatesContainer>
-                        <FormButton variant="contained" onClick={this.order} color="primary" fullWidth data-testid="TripSwitcher-submit">Заказать</FormButton>
-                    </BottomPaper>
+                    <form onSubmit={this.props.handleSubmit(this.order)}>
+                        <FormPaper elevation={1}>
+                            <FormContainer>
+                                <StyledFormControl>
+                                    <Select
+                                        id="select-from"
+                                        name="from"
+                                        label="Откуда"
+                                        autoWidth
+                                        value={this.props.from || ""}
+                                        inputProps={{"data-testid": "select-from"}}
+                                    >
+                                    {
+                                        this.props.addressList
+                                            .filter(val => val !== this.props.to)
+                                            .map((val) => (
+                                                <MenuItem key={val} value={val}>{val}</MenuItem>
+                                            ))
+                                    }
+                                    </Select>
+                                </StyledFormControl>
+                                <StyledFormControl>
+                                    <Select
+                                        id="select-to"
+                                        name="to"
+                                        label="Куда"
+                                        autoWidth
+                                        value={this.props.to || ""}
+                                        inputProps={{"data-testid": "select-to"}}
+                                    >
+                                    {
+                                        this.props.addressList
+                                            .filter(val => val !== this.props.from)
+                                            .map((val) => (
+                                                <MenuItem key={val} value={val}>{val}</MenuItem>
+                                            ))
+                                    }
+                                    </Select>
+                                </StyledFormControl>
+                            </FormContainer>
+                        </FormPaper>
+                        <BottomPaper elevation={5}>
+                            <RatesContainer>
+                                {rates.map((rate, index) => (
+                                    <RatePaper
+                                        className={this.state.rateIndex === index ? "active" : undefined}
+                                        key={index}
+                                        elevation={3}
+                                        onClick={() => this.switchRate(index)}
+                                        data-testid={`rate-${index}`}
+                                    >
+                                        <Typography variant="body1">{rate.caption}</Typography>
+                                        <RatePriceCaption variant="caption">Стоимость</RatePriceCaption>
+                                        <RatePriceValue variant="h6">{rate.price}</RatePriceValue>
+                                        <RateCardMedia image={`/static/media/${rate.img}`} />
+                                    </RatePaper>
+                                ))}
+                            </RatesContainer>
+                            <FormButton variant="contained" color="primary" fullWidth data-testid="TripSwitcher-submit" type="submit">Заказать</FormButton>
+                        </BottomPaper>
+                    </form>
                 </ComponentContainer>
             </ComponentWrapper>
         }
@@ -309,7 +285,9 @@ class TripSwitcher extends React.Component {
 const mapStateToProps = state => ({
     isCardFilled: getIsCardFilled(state),
     addressList: getAddressList(state),
-    orderDone: !!getRoutePoints(state)
+    orderDone: !!getRoutePoints(state),
+    from: (getFormValues("tripSwitcher")(state) || {}).from,
+    to: (getFormValues("tripSwitcher")(state) || {}).to
 });
 
 const mapDispatchToProps = {
@@ -317,7 +295,25 @@ const mapDispatchToProps = {
     clearRoute
 };
 
+const formValidator = ({ from, to }) => {
+    const errors = {};
+    if (!from) {
+        errors.from = "required";
+    }
+
+    if (!to) {
+        errors.to = "required";
+    }
+
+    return errors;
+};
+
+const WrappedTripSwitcher = reduxForm({
+    form: "tripSwitcher",
+    validate: formValidator
+})(TripSwitcher);
+
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(TripSwitcher);
+)(WrappedTripSwitcher);
