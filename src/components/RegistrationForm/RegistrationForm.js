@@ -1,45 +1,40 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import { FlexRow, FlexRowSpacer } from "../form/FlexRow/FlexRow";
-import LoginLink from "./LoginLink/LoginLink";
+import { Input, Row, RowSpacer } from "../form";
+import { LoginLink } from "./components";
 
 import "./RegistrationForm.css";
-import { Container, Paper, styled, TextField, Typography } from "@material-ui/core";
-import SubmitButton from "../SubmitButton/SubmitButton";
+import { Container, Paper, withStyles, Typography } from "@material-ui/core";
+import { Button } from "../form";
 import { connect } from "react-redux";
 import { registrationRequest, getRegistrationError } from "../../modules/user";
+import { reduxForm } from "redux-form";
+import formValidator from "./utils/validator";
 
-const RegistrationFormPaper = styled(Paper)({
-    width: "520px",
-    padding: "48px 0",
-    borderRadius: "20px"
-});
+const RegistrationFormPaper = withStyles({
+    root: {
+        width: "520px",
+        padding: "48px 0",
+        borderRadius: "20px"
+    }
+})(Paper);
 
-const RegistrationFormContainer = styled(Container)({
-    display: "flex",
-    padding: "0 102px 0 98px",
-    alignItems: "center",
-    flexDirection: "column"
-});
+const RegistrationFormContainer = withStyles({
+    root: {
+        display: "flex",
+        padding: "0 102px 0 98px",
+        alignItems: "center",
+        flexDirection: "column"
+    }
+})(Container);
 
 export class RegistrationForm extends React.Component {
     static propTypes = {
         register: PropTypes.func.isRequired
     }
 
-    register = event => {
-        event.preventDefault();
-
-        const email = event.target.email.value;
-        const lastName = event.target.lastName.value;
-        const firstName = event.target.firstName.value;
-        const password = event.target.password.value;
-
-        if (!email || !lastName || !firstName || !password) {
-            return ;
-        }
-
+    register = ({ email, lastName, firstName, password }) => {
         this.props.register(email, password, lastName, firstName);
     }
 
@@ -48,46 +43,42 @@ export class RegistrationForm extends React.Component {
             <RegistrationFormPaper className="RegistrationForm" elevation={5}>
                 <RegistrationFormContainer maxWidth="lg">
                     <Typography variant="h4">Регистрация</Typography>
-                    <form onSubmit={this.register} data-testid="RegistrationForm-form">
-                        <TextField
+                    <form onSubmit={this.props.handleSubmit(this.register)} data-testid="RegistrationForm-form">
+                        <Input
                             margin="normal"
                             required
                             fullWidth
                             type="email"
                             label="Адрес электронной почты"
                             name="email"
-                            error={this.props.hasError}
                         />
-                        <FlexRow>
-                            <TextField
+                        <Row>
+                            <Input
                                 margin="normal"
                                 required
                                 fullWidth
                                 label="Имя"
                                 name="firstName"
-                                error={this.props.hasError}
                             />
-                            <FlexRowSpacer />
-                            <TextField
+                            <RowSpacer />
+                            <Input
                                 margin="normal"
                                 required
                                 fullWidth
                                 label="Фамилия"
                                 name="lastName"
-                                error={this.props.hasError}
                             />
-                        </FlexRow>
-                        <TextField
+                        </Row>
+                        <Input
                             margin="normal"
                             required
                             fullWidth
                             type="password"
                             label="Пароль"
                             name="password"
-                            error={this.props.hasError}
                         />
 
-                        <SubmitButton data-testid="RegistrationForm-SubmitButton">Зарегистрироваться</SubmitButton>
+                        <Button style={{marginTop: "8px"}} data-testid="RegistrationForm-SubmitButton" type="submit">Зарегистрироваться</Button>
                     </form>
                     <LoginLink />
                 </RegistrationFormContainer>
@@ -104,7 +95,12 @@ const mapDispatchToProps = {
     register: (email, password, surname, name) => registrationRequest({ email, password, surname, name })
 };
 
+const WrappedRegistrationForm = reduxForm({
+    form: "loginForm",
+    validate: formValidator
+})(RegistrationForm);
+
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(RegistrationForm);
+)(WrappedRegistrationForm);

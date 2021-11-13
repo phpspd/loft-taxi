@@ -4,31 +4,17 @@ import { Router } from "react-router";
 import { createMemoryHistory } from "history";
 import { Provider } from 'react-redux';
 import { render } from "@testing-library/react";
+import { createStoreMock } from "../../helpers/createStoreMock";
 
 describe("Profile", () => {
     let history;
-    const getStore = (state) => {
-        state = state || {
-            user: {},
-            profile: {}
-        };
-        
-        return {
-            getState: () => ({
-                user: state.user || {},
-                profile: state.profile || {}
-            }),
-            subscribe: jest.fn(),
-            dispatch: jest.fn()
-        }
-    };
 
     beforeEach(() => {
         history = createMemoryHistory();
     });
 
     it("redirects to /registration if not logged in", () => {
-        const store = getStore({
+        const store = createStoreMock({
             user: {
                 isLoggedIn: false
             }
@@ -49,7 +35,7 @@ describe("Profile", () => {
     });
 
     it("not redirects if logged in", () => {
-        const store = getStore({
+        const store = createStoreMock({
             user: {
                 isLoggedIn: true
             }
@@ -69,7 +55,7 @@ describe("Profile", () => {
     });
 
     it("renders component if logged in", () => {
-        const store = getStore({
+        const store = createStoreMock({
             user: {
                 isLoggedIn: true
             }

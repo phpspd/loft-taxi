@@ -6,24 +6,10 @@ import { createMemoryHistory } from "history";
 import { Provider } from 'react-redux';
 import { render, fireEvent } from "@testing-library/react";
 import * as profileActions from "../../modules/profile/actions";
+import { dispatched, createStoreMock } from "../../helpers/createStoreMock";
 
 describe("Profile", () => {
     let history;
-    const getStore = (state) => {
-        state = state || {
-            user: {},
-            profile: {}
-        };
-        
-        return {
-            getState: () => ({
-                user: state.user || {},
-                profile: state.profile || {}
-            }),
-            subscribe: jest.fn(),
-            dispatch: jest.fn()
-        }
-    };
 
     beforeEach(() => {
         history = createMemoryHistory();
@@ -33,7 +19,7 @@ describe("Profile", () => {
         const div = document.createElement("div");
         ReactDOM.render(
             <Router history={history}>
-                <Provider store={getStore()}>
+                <Provider store={createStoreMock()}>
                     <Profile />
                 </Provider>
             </Router>,
@@ -43,11 +29,12 @@ describe("Profile", () => {
     });
 
     it("dispatches clearIsSaved if isSaved", () => {
-        const store = getStore({
+        const store = createStoreMock({
             profile: {
                 isSaved: true
             }
         });
+
         render(
             <Router history={history}>
                 <Provider store={store}>
@@ -56,11 +43,11 @@ describe("Profile", () => {
             </Router>
         );
 
-        expect(store.dispatch).toBeCalled();
+        expect(dispatched.length).toEqual(1);
     });
 
     it("changes cardHolder and set upper-cased value", () => {
-        const store = getStore();
+        const store = createStoreMock();
         const { getByTestId } = render(
             <Router history={history}>
                 <Provider store={store}>
@@ -76,7 +63,7 @@ describe("Profile", () => {
     });
 
     it("changes cardNumber", () => {
-        const store = getStore();
+        const store = createStoreMock();
         const { getByTestId } = render(
             <Router history={history}>
                 <Provider store={store}>
@@ -92,7 +79,7 @@ describe("Profile", () => {
     });
 
     it("formats cardNumber", () => {
-        const store = getStore();
+        const store = createStoreMock();
         const { getByTestId } = render(
             <Router history={history}>
                 <Provider store={store}>
@@ -108,7 +95,7 @@ describe("Profile", () => {
     });
 
     it("puts cardNumber to placeCardNumber", () => {
-        const store = getStore();
+        const store = createStoreMock();
         const { getByTestId } = render(
             <Router history={history}>
                 <Provider store={store}>
@@ -118,14 +105,14 @@ describe("Profile", () => {
         );
 
         const input = getByTestId("cardNumber");
-        const place = getByTestId("placeCardNumber");
         fireEvent.change(input, { target: { value: "1234567890123456" } });
+        const place = getByTestId("placeCardNumber");
 
         expect(place.innerHTML).toEqual("1234 5678 9012 3456");
     });
 
     it("puts 16 zeros to the placeCardNumber if cardNumber is empty", () => {
-        const store = getStore();
+        const store = createStoreMock();
         const { getByTestId } = render(
             <Router history={history}>
                 <Provider store={store}>
@@ -142,7 +129,7 @@ describe("Profile", () => {
     });
 
     it("not modify cardNumber if value has non-digit symbol", () => {
-        const store = getStore();
+        const store = createStoreMock();
         const { getByTestId } = render(
             <Router history={history}>
                 <Provider store={store}>
@@ -163,7 +150,7 @@ describe("Profile", () => {
     });
 
     it("puts only 19 symbols to cardNumber if it over 19 symbols length", () => {
-        const store = getStore();
+        const store = createStoreMock();
         const { getByTestId } = render(
             <Router history={history}>
                 <Provider store={store}>
@@ -179,7 +166,7 @@ describe("Profile", () => {
     });
 
     it("cuts non-digit or \"/\" symbol and extra-length symbols in expiryDate", () => {
-        const store = getStore();
+        const store = createStoreMock();
         const { getByTestId } = render(
             <Router history={history}>
                 <Provider store={store}>
@@ -203,7 +190,7 @@ describe("Profile", () => {
     });
 
     it("cuts non-digit symbols and extra-length symbols in cvc", () => {
-        const store = getStore();
+        const store = createStoreMock();
         const { getByTestId } = render(
             <Router history={history}>
                 <Provider store={store}>
@@ -228,7 +215,7 @@ describe("Profile", () => {
 
     it("calls save action on form submit", () => {
         const save = jest.spyOn(profileActions, "saveRequest").mockImplementation(jest.fn());
-        const store = getStore({
+        const store = createStoreMock({
             user: {
                 isLoggedId: true,
                 token: "token123"
@@ -245,7 +232,7 @@ describe("Profile", () => {
         const form = getByTestId("Profile-form");
 
         fireEvent.change(getByTestId("cardHolder"), { target: { value: "CARD HOLDER" } });
-        fireEvent.change(getByTestId("cardNumber"), { target: { value: "1234 5678" } });
+        fireEvent.change(getByTestId("cardNumber"), { target: { value: "1234 5678 1234 1234" } });
         fireEvent.change(getByTestId("expiryDate"), { target: { value: "02/12" } });
         fireEvent.change(getByTestId("cvc"), { target: { value: "123" } });
 
@@ -253,7 +240,7 @@ describe("Profile", () => {
 
         expect(save).toBeCalledWith({
             cardHolder: "CARD HOLDER",
-            cardNumber: "1234 5678",
+            cardNumber: "1234 5678 1234 1234",
             expiryDate: (new Date(2012, 1)).toISOString(),
             cvc: "123",
             token: "token123"
@@ -261,7 +248,7 @@ describe("Profile", () => {
     });
 
     it("converts correctly expiryDate from state to view", () => {
-        const store = getStore({
+        const store = createStoreMock({
             profile: {
                 expiryDate: (new Date(2013, 2)).toISOString()
             }

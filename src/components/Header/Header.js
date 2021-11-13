@@ -2,13 +2,15 @@ import React from "react";
 
 import Navigation from "../Navigation/Navigation";
 
-import { AppBar, styled } from "@material-ui/core";
+import { AppBar, withStyles } from "@material-ui/core";
 
 
-const HeaderAppBar = styled(AppBar)({
-    color: "#fff",
-    backgroundColor: "#1C1A19"
-});
+const HeaderAppBar = withStyles({
+    root: {
+        color: "#fff",
+        backgroundColor: "#1C1A19"
+    }
+})(AppBar);
 
 export default class Header extends React.Component {
     render() {

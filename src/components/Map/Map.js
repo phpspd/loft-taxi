@@ -5,6 +5,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import TripSwitcher from "../TripSwitcher/TripSwitcher";
 import { connect } from "react-redux";
 import { getRoutePoints } from "../../modules/route";
+import { drawRoute, clearRoute } from "./helpers";
 
 mapboxgl.accessToken = "pk.eyJ1IjoicXVha2VhcmVuYSIsImEiOiJja3VyYXNtYzQxcTVqMnZwMXJobGYweGQ0In0.D18R6ely07uC5nxFK5d0Vg";
 
@@ -19,68 +20,36 @@ class Map extends React.Component {
 
         this.map.setStyle("mapbox://styles/mapbox/light-v10");
 
-        this.map.on("load", this.drawRoute);
-
-        //this.drawRoute();
+        if (this.props.routePoints && this.props.routePoints.length && this.map) {
+            this.map.on("load", () => this.drawRoute(this.props.routePoints));
+        }
     }
 
     componentWillUnmount() {
-        this.map.remove();
+        if (this.map) {
+            this.map.remove();
+        }
     }
 
-    componentDidUpdate() {
-        this.drawRoute();
+    componentDidUpdate(prevProps) {
+        const { routePoints } = this.props;
+        const { routePoints: prevRoutePoints } = prevProps;
+        if (prevRoutePoints !== routePoints) {
+            this.clearMap();
+            this.drawRoute(routePoints);
+        }
     }
 
-    drawRoute = () => {
-        const points = this.props.routePoints;
-        if (!Array.isArray(points) || !points.length) {
-            if (this.map.getSource("route")) {
-                this.map.removeLayer("route");
-                this.map.removeSource("route");
-            }
-            return;
+    clearMap() {
+        if (this.map) {
+            clearRoute(this.map);
         }
-        this.map.flyTo({
-            center: points[0],
-            zoom: 15
-        });
+    }
 
-        if (!this.map.getLayer("route")) {
-            this.map.addLayer({
-                id: "route",
-                type: "line",
-                source: {
-                    type: "geojson",
-                    data: {
-                        type: "Feature",
-                        properties: {},
-                        geometry: {
-                            type: "LineString",
-                            coordinates: points
-                        }
-                    }
-                },
-                layout: {
-                    "line-join": "round",
-                    "line-cap": "round"
-                },
-                paint: {
-                    "line-color": "#ffc617",
-                    "line-width": 8
-                }
-            });
-        } else {
-            this.map.getSource("route").setData({
-                type: "Feature",
-                properties: {},
-                geometry: {
-                    type: "LineString",
-                    coordinates: points
-                }
-            });
+    drawRoute = (routePoints) => {
+        if (this.map) {
+            drawRoute(this.map, routePoints);
         }
-
     }
 
     render() {

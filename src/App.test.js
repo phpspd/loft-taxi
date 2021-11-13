@@ -4,34 +4,20 @@ import { Router } from "react-router";
 import App from "./App";
 import { createMemoryHistory } from "history";
 import { render } from "@testing-library/react";
+import { createStoreMock } from "./helpers/createStoreMock";
 
 jest.mock("./components/Map/Map", () => () => "MapPage");
 jest.mock("./components/Header/Header", () => () => "Header Component");
 
 describe("App", () => {
     let history;
-    const getStore = (state) => {
-        state = state || {
-            user: {},
-            profile: {}
-        };
-        
-        return {
-            getState: () => ({
-                user: state.user || {},
-                profile: state.profile || {}
-            }),
-            subscribe: jest.fn(),
-            dispatch: jest.fn()
-        }
-    };
     
     beforeEach(() => {
         history = createMemoryHistory();
     });
 
     it("renders with Header if logged in", () => {
-        const store = getStore({
+        const store = createStoreMock({
             user: {
                 isLoggedIn: true
             }
@@ -48,11 +34,12 @@ describe("App", () => {
     });
 
     it("renders without Header if not logged in", () => {
-        const store = getStore({
+        const store = createStoreMock({
             user: {
                 isLoggedIn: false
             }
         });
+        
         const { queryByText } = render(
             <Provider store={store}>
                 <Router history={history}>
@@ -67,11 +54,12 @@ describe("App", () => {
     it("sets title on mounting", () => {
         const spy = jest.spyOn(document, "title", "set");
 
-        const store = getStore({
+        const store = createStoreMock({
             user: {
                 isLoggedIn: false
             }
         });
+
         render(
             <Provider store={store}>
                 <Router history={history}>

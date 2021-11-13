@@ -5,6 +5,7 @@ import mapboxgl from "mapbox-gl";
 import { Provider } from "react-redux";
 import { Router } from "react-router";
 import { createMemoryHistory } from "history";
+import { createStoreMock } from "../../helpers/createStoreMock";
 
 jest.mock("mapbox-gl", () => ({
     Map: class {
@@ -36,23 +37,6 @@ jest.mock("mapbox-gl", () => ({
 
 describe("Map", () => {
     let history;
-    const getStore = (state) => {
-        state = state || {
-            user: {},
-            profile: {},
-            route: {}
-        };
-        
-        return {
-            getState: () => ({
-                user: state.user || {},
-                profile: state.profile || {},
-                route: state.route || {},
-            }),
-            subscribe: jest.fn(),
-            dispatch: jest.fn()
-        }
-    };
 
     beforeEach(() => {
         history = createMemoryHistory();
@@ -61,7 +45,7 @@ describe("Map", () => {
     it("has map container", () => {
         const { getByTestId } = render(
             <Router history={history}>
-                <Provider store={getStore()}>
+                <Provider store={createStoreMock()}>
                     <Map />
                 </Provider>
             </Router>
@@ -75,7 +59,7 @@ describe("Map", () => {
         let container;
         const { getByTestId } = render(
             <Router history={history}>
-                <Provider store={getStore()}>
+                <Provider store={createStoreMock()}>
                     <Map ref={el => container = el} />
                 </Provider>
             </Router>
@@ -91,7 +75,7 @@ describe("Map", () => {
         let container;
         const { unmount } = render(
             <Router history={history}>
-                <Provider store={getStore()}>
+                <Provider store={createStoreMock()}>
                     <Map ref={el => container = el} />
                 </Provider>
             </Router>
